@@ -7,7 +7,7 @@ const os = require("os")
 const path = require("path")
 const crypto = require("crypto")
 
-const workDir = path.join(/*os.tmpdir(),*/
+const workDir = path.join(os.tmpdir(),
         crypto.randomFillSync(Buffer.alloc(32)).toString("hex"))
 
 async function cpPromise(proc, arg){
