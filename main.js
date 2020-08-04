@@ -216,9 +216,12 @@ async function cpPromise(proc, arg){
         core.debug("Updated log in " + path.join(workDir, config.changelog))
         for(const stage of config.stages){
             const arg = stage.split(/\s+/gi)
-            const cN = await cpPromise(arg[0], arg.slice(1))
-            if(cN.err !== "") throw new Error(cN.err)
-            core.debug(stage + " | " + JSON.stringify(cN, undefined, 4))
+            const _custom = await cpPromise(arg[0], arg.slice(1))
+            if(
+                (_custom.err !== "") &&
+                (_custom.code !== 0)
+            ) throw new Error(_custom.err)
+            core.debug(stage + " | " + JSON.stringify(_custom, undefined, 4))
         }
         // commit updates
         const _git7 = await cpPromise("git", [
