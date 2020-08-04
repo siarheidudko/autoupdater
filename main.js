@@ -7,7 +7,7 @@ const os = require("os")
 const path = require("path")
 const crypto = require("crypto")
 
-const workDir = path.join(os.tmpdir(),
+const workDir = path.join(/*os.tmpdir(),*/
         crypto.randomFillSync(Buffer.alloc(32)).toString("hex"))
 
 async function cpPromise(proc, arg){
@@ -118,6 +118,7 @@ async function cpPromise(proc, arg){
         flag: "r"
     }).then((e)=>Promise.resolve(JSON.parse(e)))
     let isUpdated = false
+    let updatedLibs = []
     const _npm1 = await cpPromise("npm", [
         "update"
     ])
@@ -126,6 +127,12 @@ async function cpPromise(proc, arg){
         (_npm1.code !== 0)
     ) throw new Error(_npm1.err)
     core.debug("npm update | " + JSON.stringify(_npm1, undefined, 4))
+    updatedLibs = (_npm1.log.match(/\+\s\w+@\d\.\d\.\d\s*(\n|\r|\r\n)/))?
+        _npm1.log.match(/\+\s\w+@\d\.\d\.\d\s*(\n|\r|\r\n)/gm)
+            .map(e=>
+                e.replace(/\+\s/,"")
+                .replace(/@\d\.\d\.\d\s*(\n|\r|\r\n)/,"")
+            ):updatedLibs
     if(_npm1.log.length > 0)
         isUpdated = true
     const _npm2 = await cpPromise("npm", [
@@ -136,11 +143,14 @@ async function cpPromise(proc, arg){
         (_npm2.code !== 0)
     ) throw new Error(_npm2.err)
     core.debug("npm outdate | " + JSON.stringify(_npm2, undefined, 4))
-    let updates
     if(_npm2.log.length > 0){
-        updates = _npm2.log.split("\n")
+        const updates = _npm2.log.split("\n")
             .map((e)=>e.replace(/\s.+$/gi, ""))
             .filter((e)=>((e !== "Package")&&(e !== "")))
+        updatedLibs = [
+            ...updatedLibs,
+            ...updates
+        ]
         const dependencies = updates.filter((e)=>(typeof(pkg.dependencies[e]) === "string"))
             .map((e)=>e+"@latest")
         const devDependencies = updates.filter((e)=>(typeof(pkg.devDependencies[e]) === "string"))
@@ -195,7 +205,7 @@ async function cpPromise(proc, arg){
             pkg.version + 
             " / " + 
             new Date().toJSON().substr(0,10) + 
-            "\n\n### :tada: Enhancements\n- Updated dependencies: " + updates.join(", ") + "\n\n"
+            "\n\n### :tada: Enhancements\n- Updated dependencies: " + updatedLibs.join(", ") + "\n\n"
         await fs.promises.writeFile(path.join(workDir, config.changelog), Buffer.concat([
             Buffer.from(msg), 
             changelog
@@ -223,13 +233,13 @@ async function cpPromise(proc, arg){
         const _git8 = await cpPromise("git", [
             "commit",
             "-m",
-            "\"Updated dependencies: " + updates.join(", ") + "\""
+            "\"Updated dependencies: " + updatedLibs.join(", ") + "\""
         ])
         if(
             (_git8.err !== "") &&
             (_git8.code !== 0)
         ) throw new Error(_git8.err)
-        core.debug("git commit -m \"Updated dependencies: " + updates.join(", ") + "\" | " + JSON.stringify(_git8, undefined, 4))   
+        core.debug("git commit -m \"Updated dependencies: " + updatedLibs.join(", ") + "\" | " + JSON.stringify(_git8, undefined, 4))   
         const _git9 = await cpPromise("git", [
             "tag",
             "v" + pkg.version
@@ -260,10 +270,13 @@ async function cpPromise(proc, arg){
         ) throw new Error(_git11.err)
         core.debug("git push autoupdater v" + pkg.version + " | " + JSON.stringify(_git11, undefined, 4))
     }
+    return
 })().then((e) => {
     core.info((e) ? e : "Completed")
     setTimeout(process.exit, 1, 0)
 }).catch((e) => {
-    core.setFailed((e) ? e : new Error("Unknown error"))
+    const err = (e) ? e : new Error("Unknown error")
+    core.error(err)
+    core.setFailed(err)
     setTimeout(process.exit, 1, 1)
 })
