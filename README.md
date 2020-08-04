@@ -68,7 +68,7 @@ jobs:
       - name: Autoupdate
         uses: siarheidudko/autoupdater@v1
         with:
-        repository: 'siarheidudko/autoupdater'
+          repository: 'siarheidudko/autoupdater'
           branch: 'test'
           token: '46e85f7652174b7fb60178e85a5ed809438b4a44'
           package-json: 'package.json'
