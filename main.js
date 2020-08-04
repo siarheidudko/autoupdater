@@ -46,39 +46,39 @@ async function cpPromise(proc, arg){
 }
 
 (async () => {
-    core.saveState("AutoUpdaterconfig.dir", config.dir)
-    core.saveState("AutoUpdaterPID", process.pid)
     if(
-        (typeof(core.getInput("package-json")) === "string")
+        (typeof(core.getInput("package-json")) === "string") &&
         (core.getInput("package-json") !== "")
     ) config.pkg = core.getInput("package-json")
     if(
-        (typeof(core.getInput("changelog")) === "string")
+        (typeof(core.getInput("changelog")) === "string") &&
         (core.getInput("changelog") !== "")
     ) config.changelog = core.getInput("changelog")
     if(
-        (typeof(core.getInput("repository")) === "string")
+        (typeof(core.getInput("repository")) === "string") &&
         (core.getInput("repository") !== "")
     ) config.repo = core.getInput("repository")
     if(
-        (typeof(core.getInput("branch")) === "string")
+        (typeof(core.getInput("branch")) === "string") &&
         (core.getInput("branch") !== "")
     ) config.branch = core.getInput("branch")
     if(
-        (typeof(core.getInput("github-token")) === "string")
+        (typeof(core.getInput("github-token")) === "string") &&
         (core.getInput("github-token") !== "")
     ) config.githubToken = core.getInput("github-token")
     if(
-        (typeof(core.getInput("stages")) === "stages")
+        (typeof(core.getInput("stages")) === "string") &&
         (core.getInput("stages") !== "")
     ) config.stages = core.getInput("stages")
     if(
-        (typeof(core.getInput("working-directory")) === "string")
+        (typeof(core.getInput("working-directory")) === "string") &&
         (core.getInput("working-directory") !== "")
     ) config.dir = core.getInput("working-directory")
     await fs.promises.mkdir(config.dir, {
         recursive: true
     })
+    core.saveState("AutoUpdaterconfig.dir", config.dir)
+    core.saveState("AutoUpdaterPID", process.pid)
     // initialize and checkout repo
     const _git1 = await cpPromise("git", [
         "init"
