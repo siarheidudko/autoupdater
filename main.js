@@ -47,31 +47,31 @@ async function cpPromise(proc, arg){
 
 (async () => {
     if(
-        (typeof(core.getInput("package-json")) === "string") &&
+        (core.getInput("package-json")) &&
         (core.getInput("package-json") !== "")
     ) config.pkg = core.getInput("package-json")
     if(
-        (typeof(core.getInput("changelog")) === "string") &&
+        (core.getInput("changelog")) &&
         (core.getInput("changelog") !== "")
     ) config.changelog = core.getInput("changelog")
     if(
-        (typeof(core.getInput("repository")) === "string") &&
+        (core.getInput("repository")) &&
         (core.getInput("repository") !== "")
     ) config.repo = core.getInput("repository")
     if(
-        (typeof(core.getInput("branch")) === "string") &&
+        (core.getInput("branch")) &&
         (core.getInput("branch") !== "")
     ) config.branch = core.getInput("branch")
     if(
-        (typeof(core.getInput("github-token")) === "string") &&
+        (core.getInput("github-token")) &&
         (core.getInput("github-token") !== "")
     ) config.githubToken = core.getInput("github-token")
     if(
-        (typeof(core.getInput("stages")) === "string") &&
+        (core.getInput("stages")) &&
         (core.getInput("stages") !== "")
     ) config.stages = core.getInput("stages")
     if(
-        (typeof(core.getInput("working-directory")) === "string") &&
+        (core.getInput("working-directory")) &&
         (core.getInput("working-directory") !== "")
     ) config.dir = core.getInput("working-directory")
     await fs.promises.mkdir(config.dir, {
