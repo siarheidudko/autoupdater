@@ -77,4 +77,5 @@ jobs:
           token: '46e85f7652174b7fb60178e85a5ed809438b4a44'
           package-json: 'package.json'
           stages: 'npm run lint&&npm run build&&npm run test'
+          working-directory: ${{ github.workspace }}/'autoupdater_directory'
 ```
