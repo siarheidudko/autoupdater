@@ -7,8 +7,15 @@ const os = require("os")
 const path = require("path")
 const crypto = require("crypto")
 
-const workDir = path.join(os.tmpdir(),
-        crypto.randomFillSync(Buffer.alloc(32)).toString("hex"))
+const config = {
+    pkg: "./package.json",
+    changelog: "./CHANGELOG.md",
+    repo: "",
+    branch: "master",
+    githubToken: "",
+    stages: [],
+    dir: path.join(os.tmpdir(), crypto.randomFillSync(Buffer.alloc(32)).toString("hex"))
+}
 
 async function cpPromise(proc, arg){
     return await new Promise((res, rej) =>{
@@ -16,7 +23,7 @@ async function cpPromise(proc, arg){
             env: {
                 ...process.env
             },
-            cwd: workDir
+            cwd: config.dir
         })
         const log = []
         const err = []
@@ -39,17 +46,37 @@ async function cpPromise(proc, arg){
 }
 
 (async () => {
-    core.saveState("AutoUpdaterWorkDir", workDir)
+    core.saveState("AutoUpdaterconfig.dir", config.dir)
     core.saveState("AutoUpdaterPID", process.pid)
-    const config = {
-        pkg: core.getInput("package-json") ? core.getInput("package-json") : "./package.json",
-        changelog: core.getInput("changelog") ? core.getInput("changelog") : "./CHANGELOG.md",
-        repo: core.getInput("repository") ? core.getInput("repository"): "",
-        branch: core.getInput("branch") ? core.getInput("branch") : "master",
-        githubToken: core.getInput("github-token") ? core.getInput("github-token") : "",
-        stages: core.getInput("stages") ? core.getInput("stages").split("&&").filter((e)=>(e !== "")) : []
-    }
-    await fs.promises.mkdir(workDir, {
+    if(
+        (typeof(core.getInput("package-json")) === "string")
+        (core.getInput("package-json") !== "")
+    ) config.pkg = core.getInput("package-json")
+    if(
+        (typeof(core.getInput("changelog")) === "string")
+        (core.getInput("changelog") !== "")
+    ) config.changelog = core.getInput("changelog")
+    if(
+        (typeof(core.getInput("repository")) === "string")
+        (core.getInput("repository") !== "")
+    ) config.repo = core.getInput("repository")
+    if(
+        (typeof(core.getInput("branch")) === "string")
+        (core.getInput("branch") !== "")
+    ) config.branch = core.getInput("branch")
+    if(
+        (typeof(core.getInput("github-token")) === "string")
+        (core.getInput("github-token") !== "")
+    ) config.githubToken = core.getInput("github-token")
+    if(
+        (typeof(core.getInput("stages")) === "stages")
+        (core.getInput("stages") !== "")
+    ) config.stages = core.getInput("stages")
+    if(
+        (typeof(core.getInput("working-directory")) === "string")
+        (core.getInput("working-directory") !== "")
+    ) config.dir = core.getInput("working-directory")
+    await fs.promises.mkdir(config.dir, {
         recursive: true
     })
     // initialize and checkout repo
@@ -113,7 +140,7 @@ async function cpPromise(proc, arg){
     ) throw new Error(_git6.err)
     core.debug("git checkout " + config.branch + " | " + JSON.stringify(_git6, undefined, 4))
     // update libs
-    let pkg = await fs.promises.readFile(path.join(workDir, config.pkg), {
+    let pkg = await fs.promises.readFile(path.join(config.dir, config.pkg), {
         encoding: "utf8",
         flag: "r"
     }).then((e)=>Promise.resolve(JSON.parse(e)))
@@ -183,19 +210,19 @@ async function cpPromise(proc, arg){
         }
     }
     if(isUpdated === true){
-        pkg = await fs.promises.readFile(path.join(workDir, config.pkg), {
+        pkg = await fs.promises.readFile(path.join(config.dir, config.pkg), {
             encoding: "utf8",
             flag: "r"
         }).then((e)=>Promise.resolve(JSON.parse(e)))
         pkg.version = pkg.version.split(".")
             .map((value, index, array)=>(index === (array.length -1)) ? ( Number.parseInt(value) + 1 ).toString() : value )
             .join(".")
-        await fs.promises.writeFile(path.join(workDir, config.pkg), Buffer.from(JSON.stringify(pkg, undefined, 4)), {
+        await fs.promises.writeFile(path.join(config.dir, config.pkg), Buffer.from(JSON.stringify(pkg, undefined, 4)), {
             encoding: "utf8",
             flag: "w" 
         })
-        core.debug("Updated version (" + pkg.version + ") in " + path.join(workDir, config.pkg))
-        const changelog = await fs.promises.readFile(path.join(workDir, config.changelog), {
+        core.debug("Updated version (" + pkg.version + ") in " + path.join(config.dir, config.pkg))
+        const changelog = await fs.promises.readFile(path.join(config.dir, config.changelog), {
             flag: "r"
         }).catch((e)=>{
             if(e.code === "ENOENT") return Promise.resolve(Buffer.from(""))
@@ -206,14 +233,14 @@ async function cpPromise(proc, arg){
             " / " + 
             new Date().toJSON().substr(0,10) + 
             "\n\n### :tada: Enhancements\n- Updated dependencies: " + updatedLibs.join(", ") + "\n\n"
-        await fs.promises.writeFile(path.join(workDir, config.changelog), Buffer.concat([
+        await fs.promises.writeFile(path.join(config.dir, config.changelog), Buffer.concat([
             Buffer.from(msg), 
             changelog
         ]), {
             encoding: "utf8",
             flag: "w" 
         })
-        core.debug("Updated log in " + path.join(workDir, config.changelog))
+        core.debug("Updated log in " + path.join(config.dir, config.changelog))
         for(const stage of config.stages){
             const arg = stage.split(/\s+/gi)
             const _custom = await cpPromise(arg[0], arg.slice(1))

@@ -28,6 +28,10 @@ Changelog file, default: `./CHANGELOG.md`
 
 Additional actions before commit, separator &&
 
+### `working-directory`
+
+Working directory
+
 ## Example usage
 
 ```
