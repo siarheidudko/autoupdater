@@ -6,7 +6,19 @@ const fs = require("fs")
 function T(){}
 
 (async () => {
-    if(core.getState("AutoUpdaterPID")) process.kill(core.getState("AutoUpdaterPID"))
+    if(core.getState("AutoUpdaterPID")) await new Promise((res, rej) => {
+        try {
+            const e = process.kill(core.getState("AutoUpdaterPID"))
+            res(e)
+            return
+        } catch (err) {
+            if(err.code === "ESRCH"){
+                res()
+                return
+            }
+            rej(err)
+        }
+    })
     if(core.getState("AutoUpdaterWorkDir")) await fs.promises.rmdir(core.getState("AutoUpdaterWorkDir")).catch((e)=>{
         if(e.code === "ENOENT") return Promise.resolve()
         return Promise.reject(e)
