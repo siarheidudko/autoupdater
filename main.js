@@ -251,13 +251,14 @@ async function cpPromise(proc, arg){
         core.debug("git push autoupdater " + config.branch + " | " + JSON.stringify(_git10, undefined, 4))
         const _git11 = await cpPromise("git", [
             "push",
+            "autoupdater",
             "v" + pkg.version
         ])
         if(
             (_git11.err !== "") &&
             (_git11.code !== 0)
         ) throw new Error(_git11.err)
-        core.debug("git push v" + pkg.version + " | " + JSON.stringify(_git11, undefined, 4))
+        core.debug("git push autoupdater v" + pkg.version + " | " + JSON.stringify(_git11, undefined, 4))
     }
 })().then((e) => {
     core.info((e) ? e : "Completed")
