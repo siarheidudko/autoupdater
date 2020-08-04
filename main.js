@@ -14,7 +14,8 @@ const config = {
     branch: "master",
     githubToken: "",
     stages: [],
-    dir: path.join(os.tmpdir(), crypto.randomFillSync(Buffer.alloc(32)).toString("hex"))
+    dir: path.join(os.tmpdir(), crypto.randomFillSync(Buffer.alloc(32)).toString("hex")),
+    debug: false
 }
 
 async function cpPromise(proc, arg){
@@ -80,7 +81,7 @@ async function cpPromise(proc, arg){
     core.saveState("AutoUpdaterconfig.dir", config.dir)
     core.saveState("AutoUpdaterPID", process.pid)
     // initialize and checkout repo
-    core.debug("RUN: git init")
+    if(config.debug) core.info("RUN: git init")
     const _git1 = await cpPromise("git", [
         "init"
     ])
@@ -88,8 +89,8 @@ async function cpPromise(proc, arg){
         (_git1.err !== "") &&
         (_git1.code !== 0)
     ) throw new Error(_git1.err)
-    core.debug("COMPLETE: git init | " + JSON.stringify(_git1, undefined, 4))
-    core.debug("RUN: git --local user.email \"admin@sergdudko.tk\"")
+    if(config.debug) core.info("COMPLETE: git init | " + JSON.stringify(_git1, undefined, 4))
+    if(config.debug) core.info("RUN: git --local user.email \"admin@sergdudko.tk\"")
     const _git2 = await cpPromise("git", [
         "config",
         "--local",
@@ -100,8 +101,8 @@ async function cpPromise(proc, arg){
         (_git2.err !== "") &&
         (_git2.code !== 0)
     ) throw new Error(_git2.err)
-    core.debug("COMPLETE: git --local user.email \"admin@sergdudko.tk\" | " + JSON.stringify(_git2, undefined, 4))
-    core.debug("RUN: git --local user.name \"github:siarheidudko/autoupdater\"")
+    if(config.debug) core.info("COMPLETE: git --local user.email \"admin@sergdudko.tk\" | " + JSON.stringify(_git2, undefined, 4))
+    if(config.debug) core.info("RUN: git --local user.name \"github:siarheidudko/autoupdater\"")
     const _git3 = await cpPromise("git", [
         "config",
         "--local",
@@ -112,8 +113,8 @@ async function cpPromise(proc, arg){
         (_git3.err !== "") &&
         (_git3.code !== 0)
     ) throw new Error(_git3.err)
-    core.debug("COMPLETE: git --local user.name \"github:siarheidudko/autoupdater\" | " + JSON.stringify(_git3, undefined, 4))
-    core.debug("RUN: git remote add autoupdater https://github.com/" + config.repo + ".git")
+    if(config.debug) core.info("COMPLETE: git --local user.name \"github:siarheidudko/autoupdater\" | " + JSON.stringify(_git3, undefined, 4))
+    if(config.debug) core.info("RUN: git remote add autoupdater https://github.com/" + config.repo + ".git")
     const _git4 = await cpPromise("git", [
         "remote",
         "add",
@@ -124,8 +125,8 @@ async function cpPromise(proc, arg){
         (_git4.err !== "") &&
         (_git4.code !== 0)
     ) throw new Error(_git4.err)
-    core.debug("COMPLETE: git remote add autoupdater https://github.com/" + config.repo + ".git | " + JSON.stringify(_git4, undefined, 4))
-    core.debug("RUN: git fetch autoupdater")
+    if(config.debug) core.info("COMPLETE: git remote add autoupdater https://github.com/" + config.repo + ".git | " + JSON.stringify(_git4, undefined, 4))
+    if(config.debug) core.info("RUN: git fetch autoupdater")
     const _git5 = await cpPromise("git", [
         "fetch",
         "autoupdater"
@@ -134,8 +135,8 @@ async function cpPromise(proc, arg){
         (_git5.err !== "") &&
         (_git5.code !== 0)
     ) throw new Error(_git5.err)
-    core.debug("COMPLETE: git fetch autoupdater | " + JSON.stringify(_git5, undefined, 4))
-    core.debug("RUN: git checkout " + config.branch)
+    if(config.debug) core.info("COMPLETE: git fetch autoupdater | " + JSON.stringify(_git5, undefined, 4))
+    if(config.debug) core.info("RUN: git checkout " + config.branch)
     const _git6 = await cpPromise("git", [
         "checkout",
         config.branch
@@ -144,9 +145,9 @@ async function cpPromise(proc, arg){
         (_git6.err !== "") &&
         (_git6.code !== 0)
     ) throw new Error(_git6.err)
-    core.debug("COMPLETE: git checkout " + config.branch + " | " + JSON.stringify(_git6, undefined, 4))
+    if(config.debug) core.info("COMPLETE: git checkout " + config.branch + " | " + JSON.stringify(_git6, undefined, 4))
     // update libs
-    core.debug("RUN: npm update")
+    if(config.debug) core.info("RUN: npm update")
     let pkg = await fs.promises.readFile(path.join(config.dir, config.pkg), {
         encoding: "utf8",
         flag: "r"
@@ -160,7 +161,7 @@ async function cpPromise(proc, arg){
         (_npm1.err !== "") &&
         (_npm1.code !== 0)
     ) throw new Error(_npm1.err)
-    core.debug("COMPLETE: npm update | " + JSON.stringify(_npm1, undefined, 4))
+    if(config.debug) core.info("COMPLETE: npm update | " + JSON.stringify(_npm1, undefined, 4))
     updatedLibs = (_npm1.log.match(/\+\s\w+@\d\.\d\.\d\s*(\n|\r|\r\n)/))?
         _npm1.log.match(/\+\s\w+@\d\.\d\.\d\s*(\n|\r|\r\n)/gm)
             .map(e=>
@@ -169,7 +170,7 @@ async function cpPromise(proc, arg){
             ):updatedLibs
     if(_npm1.log.length > 0)
         isUpdated = true
-    core.debug("RUN: npm outdate")
+    if(config.debug) core.info("RUN: npm outdate")
     const _npm2 = await cpPromise("npm", [
         "outdate"
     ])
@@ -177,7 +178,7 @@ async function cpPromise(proc, arg){
         (_npm2.err !== "") &&
         (_npm2.code !== 0)
     ) throw new Error(_npm2.err)
-    core.debug("COMPLETE: npm outdate | " + JSON.stringify(_npm2, undefined, 4))
+    if(config.debug) core.info("COMPLETE: npm outdate | " + JSON.stringify(_npm2, undefined, 4))
     if(_npm2.log.length > 0){
         const updates = _npm2.log.split("\n")
             .map((e)=>e.replace(/\s.+$/gi, ""))
@@ -201,11 +202,11 @@ async function cpPromise(proc, arg){
                 (_npm3.err !== "") &&
                 (_npm3.code !== 0)
             ) throw new Error(_npm3.err)
-            core.debug("COMPLETE: npm install "+dependencies.join(" ")+" --save | " + JSON.stringify(_npm3, undefined, 4))
+            if(config.debug) core.info("COMPLETE: npm install "+dependencies.join(" ")+" --save | " + JSON.stringify(_npm3, undefined, 4))
             isUpdated = true
         }
         if(devDependencies.length > 0){
-            core.debug("RUN: npm install "+devDependencies.join(" ")+" --save-dev")
+            if(config.debug) core.info("RUN: npm install "+devDependencies.join(" ")+" --save-dev")
             const _npm4 = await cpPromise("npm", [
                 "install", 
                 ...devDependencies, 
@@ -215,12 +216,12 @@ async function cpPromise(proc, arg){
                 (_npm4.err !== "") &&
                 (_npm4.code !== 0)
             ) throw new Error(_npm4.err)
-            core.debug("COMPLETE: npm install "+devDependencies.join(" ")+" --save-dev | " + JSON.stringify(_npm4, undefined, 4))
+            if(config.debug) core.info("COMPLETE: npm install "+devDependencies.join(" ")+" --save-dev | " + JSON.stringify(_npm4, undefined, 4))
             isUpdated = true
         }
     }
     if(isUpdated === true){
-        core.debug("RUN: Updating version (" + pkg.version + ") in " + path.join(config.dir, config.pkg))
+        if(config.debug) core.info("RUN: Updating version (" + pkg.version + ") in " + path.join(config.dir, config.pkg))
         pkg = await fs.promises.readFile(path.join(config.dir, config.pkg), {
             encoding: "utf8",
             flag: "r"
@@ -232,8 +233,8 @@ async function cpPromise(proc, arg){
             encoding: "utf8",
             flag: "w" 
         })
-        core.debug("COMPLETE: Updated version (" + pkg.version + ") in " + path.join(config.dir, config.pkg))
-        core.debug("RUN: Updating log in " + path.join(config.dir, config.changelog))
+        if(config.debug) core.info("COMPLETE: Updated version (" + pkg.version + ") in " + path.join(config.dir, config.pkg))
+        if(config.debug) core.info("RUN: Updating log in " + path.join(config.dir, config.changelog))
         const changelog = await fs.promises.readFile(path.join(config.dir, config.changelog), {
             flag: "r"
         }).catch((e)=>{
@@ -252,19 +253,19 @@ async function cpPromise(proc, arg){
             encoding: "utf8",
             flag: "w" 
         })
-        core.debug("COMPLETE: Updated log in " + path.join(config.dir, config.changelog))
+        if(config.debug) core.info("COMPLETE: Updated log in " + path.join(config.dir, config.changelog))
         for(const stage of config.stages){
             const arg = stage.split(/\s+/gi)
-            core.debug("RUN: " + stage)
+            if(config.debug) core.info("RUN: " + stage)
             const _custom = await cpPromise(arg[0], arg.slice(1))
             if(
                 (_custom.err !== "") &&
                 (_custom.code !== 0)
             ) throw new Error(_custom.err)
-            core.debug("COMPLETE: " + stage + " | " + JSON.stringify(_custom, undefined, 4))
+            if(config.debug) core.info("COMPLETE: " + stage + " | " + JSON.stringify(_custom, undefined, 4))
         }
         // commit updates
-        core.debug("RUN: git add --all")
+        if(config.debug) core.info("RUN: git add --all")
         const _git7 = await cpPromise("git", [
             "add",
             "--all"
@@ -273,8 +274,8 @@ async function cpPromise(proc, arg){
             (_git7.err !== "") &&
             (_git7.code !== 0)
         ) throw new Error(_git7.err)
-        core.debug("COMPLETE: git add --all | " + JSON.stringify(_git7, undefined, 4))
-        core.debug("RUN: git commit -m \"Updated dependencies: " + updatedLibs.join(", ") + "\"")
+        if(config.debug) core.info("COMPLETE: git add --all | " + JSON.stringify(_git7, undefined, 4))
+        if(config.debug) core.info("RUN: git commit -m \"Updated dependencies: " + updatedLibs.join(", ") + "\"")
         const _git8 = await cpPromise("git", [
             "commit",
             "-m",
@@ -284,8 +285,8 @@ async function cpPromise(proc, arg){
             (_git8.err !== "") &&
             (_git8.code !== 0)
         ) throw new Error(_git8.err)
-        core.debug("COMPLETE: git commit -m \"Updated dependencies: " + updatedLibs.join(", ") + "\" | " + JSON.stringify(_git8, undefined, 4))   
-        core.debug("RUN: git tag v" + pkg.version)
+        if(config.debug) core.info("COMPLETE: git commit -m \"Updated dependencies: " + updatedLibs.join(", ") + "\" | " + JSON.stringify(_git8, undefined, 4))   
+        if(config.debug) core.info("RUN: git tag v" + pkg.version)
         const _git9 = await cpPromise("git", [
             "tag",
             "v" + pkg.version
@@ -294,8 +295,8 @@ async function cpPromise(proc, arg){
             (_git9.err !== "") &&
             (_git9.code !== 0)
         ) throw new Error(_git9.err)
-        core.debug("COMPLETE: git tag v" + pkg.version + " | " + JSON.stringify(_git9, undefined, 4))
-        core.debug("RUN: git push autoupdater " + config.branch)
+        if(config.debug) core.info("COMPLETE: git tag v" + pkg.version + " | " + JSON.stringify(_git9, undefined, 4))
+        if(config.debug) core.info("RUN: git push autoupdater " + config.branch)
         const _git10 = await cpPromise("git", [
             "push",
             "autoupdater",
@@ -305,8 +306,8 @@ async function cpPromise(proc, arg){
             (_git10.err !== "") &&
             (_git10.code !== 0)
         ) throw new Error(_git10.err)
-        core.debug("COMPLETE: git push autoupdater " + config.branch + " | " + JSON.stringify(_git10, undefined, 4))
-        core.debug("RUN: git push autoupdater v" + pkg.version)
+        if(config.debug) core.info("COMPLETE: git push autoupdater " + config.branch + " | " + JSON.stringify(_git10, undefined, 4))
+        if(config.debug) core.info("RUN: git push autoupdater v" + pkg.version)
         const _git11 = await cpPromise("git", [
             "push",
             "autoupdater",
@@ -316,7 +317,7 @@ async function cpPromise(proc, arg){
             (_git11.err !== "") &&
             (_git11.code !== 0)
         ) throw new Error(_git11.err)
-        core.debug("COMPLETE: git push autoupdater v" + pkg.version + " | " + JSON.stringify(_git11, undefined, 4))
+        if(config.debug) core.info("COMPLETE: git push autoupdater v" + pkg.version + " | " + JSON.stringify(_git11, undefined, 4))
     }
     return
 })().then((e) => {

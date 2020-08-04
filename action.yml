@@ -29,6 +29,9 @@ inputs:
   working-directory:
     description: 'Working directory'
     default: ''
+  debug:
+    description: 'Enable debug'
+    default: false
 runs:
   using: 'node12'
   main: 'main.js'
