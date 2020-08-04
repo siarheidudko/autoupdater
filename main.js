@@ -80,6 +80,7 @@ async function cpPromise(proc, arg){
     core.saveState("AutoUpdaterconfig.dir", config.dir)
     core.saveState("AutoUpdaterPID", process.pid)
     // initialize and checkout repo
+    core.debug("RUN: git init")
     const _git1 = await cpPromise("git", [
         "init"
     ])
@@ -87,7 +88,8 @@ async function cpPromise(proc, arg){
         (_git1.err !== "") &&
         (_git1.code !== 0)
     ) throw new Error(_git1.err)
-    core.debug("git init | " + JSON.stringify(_git1, undefined, 4))
+    core.debug("COMPLETE: git init | " + JSON.stringify(_git1, undefined, 4))
+    core.debug("RUN: git --local user.email \"admin@sergdudko.tk\"")
     const _git2 = await cpPromise("git", [
         "config",
         "--local",
@@ -98,7 +100,8 @@ async function cpPromise(proc, arg){
         (_git2.err !== "") &&
         (_git2.code !== 0)
     ) throw new Error(_git2.err)
-    core.debug("git --local user.email \"admin@sergdudko.tk\" | " + JSON.stringify(_git2, undefined, 4))
+    core.debug("COMPLETE: git --local user.email \"admin@sergdudko.tk\" | " + JSON.stringify(_git2, undefined, 4))
+    core.debug("RUN: git --local user.name \"github:siarheidudko/autoupdater\"")
     const _git3 = await cpPromise("git", [
         "config",
         "--local",
@@ -109,7 +112,8 @@ async function cpPromise(proc, arg){
         (_git3.err !== "") &&
         (_git3.code !== 0)
     ) throw new Error(_git3.err)
-    core.debug("git --local user.name \"github:siarheidudko/autoupdater\" | " + JSON.stringify(_git3, undefined, 4))
+    core.debug("COMPLETE: git --local user.name \"github:siarheidudko/autoupdater\" | " + JSON.stringify(_git3, undefined, 4))
+    core.debug("RUN: git remote add autoupdater https://github.com/" + config.repo + ".git")
     const _git4 = await cpPromise("git", [
         "remote",
         "add",
@@ -120,7 +124,8 @@ async function cpPromise(proc, arg){
         (_git4.err !== "") &&
         (_git4.code !== 0)
     ) throw new Error(_git4.err)
-    core.debug("git remote add autoupdater https://github.com/" + config.repo + ".git | " + JSON.stringify(_git4, undefined, 4))
+    core.debug("COMPLETE: git remote add autoupdater https://github.com/" + config.repo + ".git | " + JSON.stringify(_git4, undefined, 4))
+    core.debug("RUN: git fetch autoupdater")
     const _git5 = await cpPromise("git", [
         "fetch",
         "autoupdater"
@@ -129,7 +134,8 @@ async function cpPromise(proc, arg){
         (_git5.err !== "") &&
         (_git5.code !== 0)
     ) throw new Error(_git5.err)
-    core.debug("git fetch autoupdater | " + JSON.stringify(_git5, undefined, 4))
+    core.debug("COMPLETE: git fetch autoupdater | " + JSON.stringify(_git5, undefined, 4))
+    core.debug("RUN: git checkout " + config.branch)
     const _git6 = await cpPromise("git", [
         "checkout",
         config.branch
@@ -138,8 +144,9 @@ async function cpPromise(proc, arg){
         (_git6.err !== "") &&
         (_git6.code !== 0)
     ) throw new Error(_git6.err)
-    core.debug("git checkout " + config.branch + " | " + JSON.stringify(_git6, undefined, 4))
+    core.debug("COMPLETE: git checkout " + config.branch + " | " + JSON.stringify(_git6, undefined, 4))
     // update libs
+    core.debug("RUN: npm update")
     let pkg = await fs.promises.readFile(path.join(config.dir, config.pkg), {
         encoding: "utf8",
         flag: "r"
@@ -153,7 +160,7 @@ async function cpPromise(proc, arg){
         (_npm1.err !== "") &&
         (_npm1.code !== 0)
     ) throw new Error(_npm1.err)
-    core.debug("npm update | " + JSON.stringify(_npm1, undefined, 4))
+    core.debug("COMPLETE: npm update | " + JSON.stringify(_npm1, undefined, 4))
     updatedLibs = (_npm1.log.match(/\+\s\w+@\d\.\d\.\d\s*(\n|\r|\r\n)/))?
         _npm1.log.match(/\+\s\w+@\d\.\d\.\d\s*(\n|\r|\r\n)/gm)
             .map(e=>
@@ -162,6 +169,7 @@ async function cpPromise(proc, arg){
             ):updatedLibs
     if(_npm1.log.length > 0)
         isUpdated = true
+    core.debug("RUN: npm outdate")
     const _npm2 = await cpPromise("npm", [
         "outdate"
     ])
@@ -169,7 +177,7 @@ async function cpPromise(proc, arg){
         (_npm2.err !== "") &&
         (_npm2.code !== 0)
     ) throw new Error(_npm2.err)
-    core.debug("npm outdate | " + JSON.stringify(_npm2, undefined, 4))
+    core.debug("COMPLETE: npm outdate | " + JSON.stringify(_npm2, undefined, 4))
     if(_npm2.log.length > 0){
         const updates = _npm2.log.split("\n")
             .map((e)=>e.replace(/\s.+$/gi, ""))
@@ -182,7 +190,8 @@ async function cpPromise(proc, arg){
             .map((e)=>e+"@latest")
         const devDependencies = updates.filter((e)=>(typeof(pkg.devDependencies[e]) === "string"))
             .map((e)=>e+"@latest")
-        if(dependencies.length > 0){ 
+        if(dependencies.length > 0){
+            ore.info("RUN: npm install "+dependencies.join(" ")+" --save")
             const _npm3 = await cpPromise("npm", [
                 "install", 
                 ...dependencies, 
@@ -192,10 +201,11 @@ async function cpPromise(proc, arg){
                 (_npm3.err !== "") &&
                 (_npm3.code !== 0)
             ) throw new Error(_npm3.err)
-            core.debug("npm install "+dependencies.join(" ")+" --save | " + JSON.stringify(_npm3, undefined, 4))
+            core.debug("COMPLETE: npm install "+dependencies.join(" ")+" --save | " + JSON.stringify(_npm3, undefined, 4))
             isUpdated = true
         }
-        if(devDependencies.length > 0){ 
+        if(devDependencies.length > 0){
+            core.debug("RUN: npm install "+devDependencies.join(" ")+" --save-dev")
             const _npm4 = await cpPromise("npm", [
                 "install", 
                 ...devDependencies, 
@@ -205,11 +215,12 @@ async function cpPromise(proc, arg){
                 (_npm4.err !== "") &&
                 (_npm4.code !== 0)
             ) throw new Error(_npm4.err)
-            core.debug("npm install "+devDependencies.join(" ")+" --save-dev | " + JSON.stringify(_npm4, undefined, 4))
+            core.debug("COMPLETE: npm install "+devDependencies.join(" ")+" --save-dev | " + JSON.stringify(_npm4, undefined, 4))
             isUpdated = true
         }
     }
     if(isUpdated === true){
+        core.debug("RUN: Updating version (" + pkg.version + ") in " + path.join(config.dir, config.pkg))
         pkg = await fs.promises.readFile(path.join(config.dir, config.pkg), {
             encoding: "utf8",
             flag: "r"
@@ -221,7 +232,8 @@ async function cpPromise(proc, arg){
             encoding: "utf8",
             flag: "w" 
         })
-        core.debug("Updated version (" + pkg.version + ") in " + path.join(config.dir, config.pkg))
+        core.debug("COMPLETE: Updated version (" + pkg.version + ") in " + path.join(config.dir, config.pkg))
+        core.debug("RUN: Updating log in " + path.join(config.dir, config.changelog))
         const changelog = await fs.promises.readFile(path.join(config.dir, config.changelog), {
             flag: "r"
         }).catch((e)=>{
@@ -240,17 +252,19 @@ async function cpPromise(proc, arg){
             encoding: "utf8",
             flag: "w" 
         })
-        core.debug("Updated log in " + path.join(config.dir, config.changelog))
+        core.debug("COMPLETE: Updated log in " + path.join(config.dir, config.changelog))
         for(const stage of config.stages){
             const arg = stage.split(/\s+/gi)
+            core.debug("RUN: " + stage)
             const _custom = await cpPromise(arg[0], arg.slice(1))
             if(
                 (_custom.err !== "") &&
                 (_custom.code !== 0)
             ) throw new Error(_custom.err)
-            core.debug(stage + " | " + JSON.stringify(_custom, undefined, 4))
+            core.debug("COMPLETE: " + stage + " | " + JSON.stringify(_custom, undefined, 4))
         }
         // commit updates
+        core.debug("RUN: git add --all")
         const _git7 = await cpPromise("git", [
             "add",
             "--all"
@@ -259,7 +273,8 @@ async function cpPromise(proc, arg){
             (_git7.err !== "") &&
             (_git7.code !== 0)
         ) throw new Error(_git7.err)
-        core.debug("git add --all | " + JSON.stringify(_git7, undefined, 4)) 
+        core.debug("COMPLETE: git add --all | " + JSON.stringify(_git7, undefined, 4))
+        core.debug("RUN: git commit -m \"Updated dependencies: " + updatedLibs.join(", ") + "\"")
         const _git8 = await cpPromise("git", [
             "commit",
             "-m",
@@ -269,7 +284,8 @@ async function cpPromise(proc, arg){
             (_git8.err !== "") &&
             (_git8.code !== 0)
         ) throw new Error(_git8.err)
-        core.debug("git commit -m \"Updated dependencies: " + updatedLibs.join(", ") + "\" | " + JSON.stringify(_git8, undefined, 4))   
+        core.debug("COMPLETE: git commit -m \"Updated dependencies: " + updatedLibs.join(", ") + "\" | " + JSON.stringify(_git8, undefined, 4))   
+        core.debug("RUN: git tag v" + pkg.version)
         const _git9 = await cpPromise("git", [
             "tag",
             "v" + pkg.version
@@ -278,7 +294,8 @@ async function cpPromise(proc, arg){
             (_git9.err !== "") &&
             (_git9.code !== 0)
         ) throw new Error(_git9.err)
-        core.debug("git tag v" + pkg.version + " | " + JSON.stringify(_git9, undefined, 4))
+        core.debug("COMPLETE: git tag v" + pkg.version + " | " + JSON.stringify(_git9, undefined, 4))
+        core.debug("RUN: git push autoupdater " + config.branch)
         const _git10 = await cpPromise("git", [
             "push",
             "autoupdater",
@@ -288,7 +305,8 @@ async function cpPromise(proc, arg){
             (_git10.err !== "") &&
             (_git10.code !== 0)
         ) throw new Error(_git10.err)
-        core.debug("git push autoupdater " + config.branch + " | " + JSON.stringify(_git10, undefined, 4))
+        core.debug("COMPLETE: git push autoupdater " + config.branch + " | " + JSON.stringify(_git10, undefined, 4))
+        core.debug("RUN: git push autoupdater v" + pkg.version)
         const _git11 = await cpPromise("git", [
             "push",
             "autoupdater",
@@ -298,7 +316,7 @@ async function cpPromise(proc, arg){
             (_git11.err !== "") &&
             (_git11.code !== 0)
         ) throw new Error(_git11.err)
-        core.debug("git push autoupdater v" + pkg.version + " | " + JSON.stringify(_git11, undefined, 4))
+        core.debug("COMPLETE: git push autoupdater v" + pkg.version + " | " + JSON.stringify(_git11, undefined, 4))
     }
     return
 })().then((e) => {
