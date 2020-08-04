@@ -1,0 +1,31 @@
+{
+    "name": "autoupdater",
+    "version": "1.0.0",
+    "description": "Automatic update of package dependencies with version up",
+    "main": "autoupdater.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "github:siarheidudko/autoupdater"
+    },
+    "keywords": [
+        "autoupdater",
+        "npm",
+        "nodejs",
+        "package",
+        "update",
+        "dependencies"
+    ],
+    "author": "Siarhei Dudko <slavianich@gmail.com>",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/siarheidudko/autoupdater/issues"
+    },
+    "homepage": "https://github.com/siarheidudko/autoupdater#readme",
+    "dependencies": {
+        "@actions/core": "^1.2.4"
+    },
+    "devDependencies": {}
+}
