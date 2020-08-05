@@ -78,7 +78,7 @@ async function cpPromise(proc, arg){
     if(
         (core.getInput("debug")) &&
         (core.getInput("debug") === "true")
-    ) config.dir = true
+    ) config.debug = true
     await fs.promises.mkdir(config.dir, {
         recursive: true
     })
