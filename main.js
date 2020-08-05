@@ -70,7 +70,7 @@ async function cpPromise(proc, arg){
     if(
         (core.getInput("stages")) &&
         (core.getInput("stages") !== "")
-    ) config.stages = core.getInput("stages") ? core.getInput("stages").split("&&").filter((e)=>(e !== "")) : []
+    ) config.stages = core.getInput("stages").split("&&").filter((e)=>(e !== ""))
     if(
         (core.getInput("working-directory")) &&
         (core.getInput("working-directory") !== "")
