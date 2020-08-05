@@ -195,7 +195,7 @@ async function cpPromise(proc, arg){
         const devDependencies = updates.filter((e)=>(typeof(pkg.devDependencies[e]) === "string"))
             .map((e)=>e+"@latest")
         if(dependencies.length > 0){
-            ore.info("RUN: npm install "+dependencies.join(" ")+" --save")
+            core.info("RUN: npm install "+dependencies.join(" ")+" --save")
             const _npm3 = await cpPromise("npm", [
                 "install", 
                 ...dependencies, 
