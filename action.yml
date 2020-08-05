@@ -31,7 +31,7 @@ inputs:
     default: ''
   debug:
     description: 'Enable debug'
-    default: false
+    default: 'false'
 runs:
   using: 'node12'
   main: 'main.js'
