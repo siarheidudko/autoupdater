@@ -166,14 +166,13 @@ async function cpPromise(proc, arg){
         (_npm1.code !== 0)
     ) throw new Error(_npm1.err)
     if(config.debug) core.info("COMPLETE: npm update | " + JSON.stringify(_npm1, undefined, 4))
-    updatedLibs = (_npm1.log.match(/\+\s\w+@\d\.\d\.\d\s*(\n|\r|\r\n)/))?
-        _npm1.log.match(/\+\s\w+@\d\.\d\.\d\s*(\n|\r|\r\n)/gm)
-            .map(e=>
+    if(_npm1.log.match(/\+\s\w+@\d\.\d\.\d\s*(\n|\r|\r\n)/)){
+        updatedLibs = _npm1.log.match(/\+\s\w+@\d\.\d\.\d\s*(\n|\r|\r\n)/gm).map(e=>
                 e.replace(/\+\s/,"")
                 .replace(/@\d\.\d\.\d\s*(\n|\r|\r\n)/,"")
-            ):updatedLibs
-    if(_npm1.log.length > 0)
+            )
         isUpdated = true
+    }
     if(config.debug) core.info("RUN: npm outdate")
     const _npm2 = await cpPromise("npm", [
         "outdate"
