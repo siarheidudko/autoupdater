@@ -64,9 +64,9 @@ async function cpPromise(proc, arg){
         (core.getInput("branch") !== "")
     ) config.branch = core.getInput("branch")
     if(
-        (core.getInput("github-token")) &&
-        (core.getInput("github-token") !== "")
-    ) config.githubToken = core.getInput("github-token")
+        (core.getInput("token")) &&
+        (core.getInput("token") !== "")
+    ) config.githubToken = core.getInput("token")
     if(
         (core.getInput("stages")) &&
         (core.getInput("stages") !== "")
