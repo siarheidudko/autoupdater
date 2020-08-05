@@ -82,7 +82,6 @@ async function cpPromise(proc, arg){
     await fs.promises.mkdir(config.dir, {
         recursive: true
     })
-    core.info(JSON.stringify(config, undefined, 4))
     core.saveState("AutoUpdaterconfig.dir", config.dir)
     core.saveState("AutoUpdaterPID", process.pid)
     // initialize and checkout repo
