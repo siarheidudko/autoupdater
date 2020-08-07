@@ -37,6 +37,8 @@ outputs:
     description: 'Update flag. If true, then the version has been updated.'
   dir:
     description: 'Directory with updates.'
+  version:
+    description: 'Package version.'
 runs:
   using: 'node12'
   main: 'main.js'

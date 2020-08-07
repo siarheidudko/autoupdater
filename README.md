@@ -42,6 +42,10 @@ Update flag. If true, then the version has been updated.
 
 Directory with updates.
 
+### `version`
+
+Package version.
+
 ## Example usage
 
 ```

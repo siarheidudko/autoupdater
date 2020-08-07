@@ -322,6 +322,7 @@ async function cpPromise(proc, arg){
         ) throw new Error(_git11.err)
         if(config.debug) core.info("COMPLETE: git push autoupdater v" + pkg.version + " | " + JSON.stringify(_git11, undefined, 4))
     }
+    core.setOutput("version", pkg.version)
     core.setOutput("updated", isUpdated)
     core.setOutput("dir", config.dir)
     return
