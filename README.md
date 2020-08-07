@@ -32,6 +32,16 @@ Additional actions before commit, separator &&
 
 Working directory
 
+## Outputs
+
+### `updated`
+
+Update flag. If true, then the version has been updated.
+
+### `dir`
+
+Directory with updates.
+
 ## Example usage
 
 ```
@@ -78,4 +88,55 @@ jobs:
           package-json: 'package.json'
           stages: 'npm run lint&&npm run build&&npm run test'
           working-directory: ${{ github.workspace }}/autoupdater_directory
+```
+
+Example with publish release and publish package
+```
+name: Autoupdate
+on:
+  schedule:
+    - cron: "0 1 * * *"
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+    steps:
+      - name: set service account file
+        id: save_service_account
+        run: echo $SERVICE_ACCOUNT>./serviceAccount.json
+      - name: install test dependencies
+        id: install_dependencies
+        run: sudo npm install firebase-tools nyc mocha eslint typedoc typescript -g
+      - name: Autoupdate
+        id: autoupdate
+        uses: siarheidudko/autoupdater@v1
+        with:
+          stages: 'npm run lint&&npm run build&&npm run cov&&npm run doc'
+      - name: Create Release
+        id: create_release
+        if: ${{ steps.autoupdate.outputs.updated == true }}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            see [CHANGELOG.md](https://github.com/siarheidudko/firebase-engine/blob/master/CHANGELOG.md)
+          draft: false
+          prerelease: false
+      - name: Set registry npm packages
+        id: set_registry
+        if: ${{ steps.autoupdate.outputs.updated == true }}
+        uses: actions/setup-node@v1
+        with:
+          registry-url: 'https://registry.npmjs.org'
+      - name: Publish package to NPM
+        id: publish_package_npm
+        if: ${{ steps.autoupdate.outputs.updated == true }}
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}   
 ```
