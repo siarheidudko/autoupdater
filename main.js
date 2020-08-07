@@ -14,7 +14,7 @@ const config = {
     branch: "master",
     githubToken: "",
     stages: [],
-    dir: path.join(os.tmpdir(), crypto.randomFillSync(Buffer.alloc(32)).toString("hex")),
+    dir: "./",
     debug: false
 }
 

@@ -28,7 +28,7 @@ inputs:
     default: ''
   working-directory:
     description: 'Working directory'
-    default: ''
+    default: ${{ github.workspace }}
   debug:
     description: 'Enable debug'
     default: 'false'
