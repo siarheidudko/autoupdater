@@ -32,6 +32,11 @@ inputs:
   debug:
     description: 'Enable debug'
     default: 'false'
+outputs:
+  updated:
+    description: 'Update flag. If true, then the version has been updated.'
+  dir:
+    description: 'Directory with updates.'
 runs:
   using: 'node12'
   main: 'main.js'
