@@ -120,27 +120,27 @@ jobs:
           stages: 'npm run lint&&npm run build&&npm run cov&&npm run doc'
       - name: Create Release
         id: create_release
-        if: ${{ steps.autoupdate.outputs.updated }} == true
+        if: ${{ steps.autoupdate.outputs.updated == 'true' }}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.autoupdate.outputs.version }}
-          release_name: ${{ steps.autoupdate.outputs.version }}
+          tag_name: v${{ steps.autoupdate.outputs.version }}
+          release_name: Release v${{ steps.autoupdate.outputs.version }}
           body: |
             see [CHANGELOG.md](https://github.com/siarheidudko/firebase-engine/blob/master/CHANGELOG.md)
           draft: false
           prerelease: false
       - name: Set registry npm packages
         id: set_registry
-        if: ${{ steps.autoupdate.outputs.updated }} == true
+        if: ${{ steps.autoupdate.outputs.updated == 'true' }}
         uses: actions/setup-node@v1
         with:
           registry-url: 'https://registry.npmjs.org'
       - name: Publish package to NPM
         id: publish_package_npm
-        if: ${{ steps.autoupdate.outputs.updated }} == true
+        if: ${{ steps.autoupdate.outputs.updated == 'true' }}
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}   
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}    
 ```
