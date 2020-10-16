@@ -1,4 +1,4 @@
-# Autoupdate you dependencies
+# Update Dependencies and Update Library
 
 This action check update and outdate dependencies, update they and incremented package version (patch) on 1, if dependencies were updated.
 
