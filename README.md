@@ -4,33 +4,69 @@ This action check update and outdate dependencies, update they and incremented p
 
 ## Inputs
 
-### `repository`
+### `token`
 
-Repository name (include account), default: `${{ github.repository }}`.
+Personal access token (PAT) used to fetch and push to the repository.
+If you use auto-update for the current repository, you can use an [automatically generated token](https://docs.github.com/en/actions/security-guides/automatic-token-authentication): `${{ secrets.GITHUB_TOKEN }}`.
+In all other cases, you must [create a PAT](https://github.com/settings/tokens) (classic or fine-grained) with read and write permissions to the repository. Default: `${{ github.token }}`.
+
+### `author-email`
+
+Author's email of the commit, default: `actions@github.com`.
+
+### `author-name`
+
+Author's name of the commit, default: `GitHUB Actions`.
+
+### `ref`
+
+Repository name with owner. For example, `siarheidudko/autoupdater`. Default: `${{ github.repository }}`.
 
 ### `branch`
 
-Branch name, default: `master`.
-
-### `token`
-
-GitHub token, default: `${{ github.token }}`
-
-### `package-json`
-
-Package file, default: `./package.json`
-
-### `changelog`
-
-Changelog file, default: `./CHANGELOG.md`
-
-### `stages`
-
-Additional actions before commit, separator &&
+Name of the branch, default: `master`.
 
 ### `working-directory`
 
-Working directory
+Working directory, default: `${{ github.workspace }}`.
+
+### `changelog-file`
+
+Path to changelog file, default: `./CHANGELOG.md`.
+
+### `package-file`
+
+Path to package.json file, default: `./package.json`.
+
+### `package-manager`
+
+Package manager (npm or yarn), default: `npm`.
+
+### `debug`
+
+Show debugging log, default: `false`.
+
+### `builds-and-checks`
+
+Checks to be performed before the push.
+Example:
+
+```yaml
+|
+  npm run lint
+  npm run build
+  npm run test
+```
+
+### `ignore-packages`
+
+Package names that should not be updated.
+Example:
+
+```yaml
+|
+  @types/node
+```
 
 ## Outputs
 
@@ -49,98 +85,80 @@ Package version.
 ## Example usage
 
 ```
-  uses: siarheidudko/autoupdater@v1
-  with:
-    repository: 'siarheidudko/autoupdater'
-    branch: 'test'
-    token: '46e85f7652174b7fb60178e85a5ed809438b4a44'
-    package-json: 'package.json'
-    changelog: 'CHANGELOG.md'
-    stages: 'npm run lint&&npm run build&&npm run test'
-```
-
-```
 name: Autoupdate
 on:
   schedule:
     - cron: "* 0/1 * * *"
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.ref }}'
+  cancel-in-progress: false
 jobs:
-  build:
+  autoupdate:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - name: Autoupdate
-        uses: siarheidudko/autoupdater@v1
-```
-
-```
-name: Autoupdate
-on:
-  schedule:
-    - cron: "* 0/1 * * *"
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Autoupdate
-        uses: siarheidudko/autoupdater@v1
-        with:
-          repository: 'siarheidudko/autoupdater'
-          branch: 'test'
-          token: '46e85f7652174b7fb60178e85a5ed809438b4a44'
-          package-json: 'package.json'
-          stages: 'npm run lint&&npm run build&&npm run test'
-          working-directory: ${{ github.workspace }}/autoupdater_directory
+        uses: siarheidudko/autoupdater@v2
 ```
 
 Example with publish release and publish package
+
 ```
 name: Autoupdate
 on:
   schedule:
     - cron: "0 1 * * *"
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.ref }}'
+  cancel-in-progress: false
 jobs:
-  check-updates:
+  update:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+    timeout-minutes: 10
     steps:
-      - name: set service account file
-        id: save_service_account
-        run: echo $SERVICE_ACCOUNT>./serviceAccount.json
-      - name: install test dependencies
-        id: install_dependencies
-        run: sudo npm install firebase-tools nyc mocha eslint typedoc typescript -g
       - name: Autoupdate
         id: autoupdate
-        uses: siarheidudko/autoupdater@v1
+        uses: siarheidudko/autoupdater@v2
         with:
-          stages: 'npm run lint&&npm run build&&npm run cov&&npm run doc'
-      - name: Create Release
-        id: create_release
-        if: ${{ steps.autoupdate.outputs.updated == 'true' }}
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.autoupdate.outputs.version }}
-          release_name: Release v${{ steps.autoupdate.outputs.version }}
-          body: |
-            see [CHANGELOG.md](https://github.com/siarheidudko/firebase-engine/blob/master/CHANGELOG.md)
-          draft: false
-          prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
+          author-email: 'sergey@dudko.dev'
+          author-name: 'Sergey Dudko'
+          ref: ${{ github.repository }}
+          branch: 'development'
+          working-directory: ${{ github.workspace }}/tmp
+          changelog-file: './CHANGELOG'
+          package-file: './package.json'
+          package-manager: 'yarn'
+          debug: 'true'
+          builds-and-checks: |
+            npm i yarn -g
+            yarn build
+            yarn test
+          ignore-packages: |
+            @types/node
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [update]
+    if: ${{ jobs.update.steps.autoupdate.outputs.updated == 'true' }}
+    steps:
+      - name: Сheckout repo
+        id: checkout_repo
+        uses: actions/checkout@v3
       - name: Set registry npm packages
         id: set_registry
-        if: ${{ steps.autoupdate.outputs.updated == 'true' }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           registry-url: 'https://registry.npmjs.org'
+      - name: Install yarn
+        id: install_yarn
+        run: npm i yarn -g
+      - name: Build package
+        id: build_package
+        run: yarn build
       - name: Publish package to NPM
         id: publish_package_npm
-        if: ${{ steps.autoupdate.outputs.updated == 'true' }}
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}    
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```

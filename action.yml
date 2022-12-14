@@ -1,13 +1,7 @@
-name: 'UpdateDependenciesUpdateLibrary'
-author: 'Siarhei Dudko <admin@sergdudko.tk>'
-description: 'Automatic update of package dependencies with version up'
+name: "UpdateDependenciesUpdateLibrary"
+author: "Siarhei Dudko <admin@sergdudko.tk>"
+description: "Automatic update of package dependencies with version up"
 inputs:
-  repository:
-    description: 'Repository name with owner. For example, actions/checkout'
-    default: ${{ github.repository }}
-  branch:
-    description: 'Branch name.'
-    default: 'master'
   token:
     description: >
       Personal access token (PAT) used to fetch the repository. The PAT is configured
@@ -17,32 +11,48 @@ inputs:
       Also when generating a new PAT, select the least scopes necessary.
       [Learn more about creating and using encrypted secrets](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets)
     default: ${{ github.token }}
-  package-json:
-    description: 'Path to package.json file'
-    default: './package.json'
-  changelog:
-    description: 'Path to changelog file'
-    default: './CHANGELOG.md'
-  stages:
-    description: 'Additional operations'
-    default: ''
+  author-email:
+    description: "Author's email of the commit."
+    default: "actions@github.com"
+  author-name:
+    description: "Author's name of the commit."
+    default: "GitHUB Actions"
+  ref:
+    description: "Repository name with owner. For example, siarheidudko/autoupdater."
+    default: ${{ github.repository }}
+  branch:
+    description: "Name of the branch."
+    default: "master"
   working-directory:
-    description: 'Working directory'
+    description: "Working directory."
     default: ${{ github.workspace }}
+  changelog-file:
+    description: "Path to changelog file."
+    default: "./CHANGELOG.md"
+  package-file:
+    description: "Path to package.json file."
+    default: "./package.json"
+  package-manager:
+    description: "Package manager (npm or yarn)."
+    default: "npm"
   debug:
-    description: 'Enable debug'
-    default: 'false'
+    description: "Show debugging log."
+    default: "false"
+  builds-and-checks:
+    description: "Checks to be performed before the push."
+  ignore-packages:
+    description: "Package names that should not be updated."
 outputs:
   updated:
-    description: 'Update flag. If true, then the version has been updated.'
+    description: "Update flag. If true, then the version has been updated."
   dir:
-    description: 'Directory with updates.'
+    description: "Directory with updates."
   version:
-    description: 'Package version.'
+    description: "Package version."
 runs:
-  using: 'node12'
-  main: 'main.js'
-  post: 'cleanup.js'
+  using: "node16"
+  main: "main.js"
+  post: "cleanup.js"
 branding:
-  icon: 'arrow-right-circle'  
-  color: 'orange'
+  icon: "arrow-right-circle"
+  color: "green"
