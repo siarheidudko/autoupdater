@@ -135,7 +135,7 @@ const { join } = require("path");
   let outdatedLibs = [];
   if (packageManager === "npm") {
     // get outdated libs
-    outdatedLibs = run(`npm run outdate`)
+    outdatedLibs = run(`npm outdate`)
       .toString()
       .split("\n")
       .map((e) => e.replace(/\s.+$/gi, ""))
@@ -153,7 +153,7 @@ const { join } = require("path");
         .join(" ")} --save-dev`
     );
     // get outdated libs after update
-    const outdatedLibs2 = run(`npm run outdate`)
+    const outdatedLibs2 = run(`npm outdate`)
       .toString()
       .split("\n")
       .map((e) => e.replace(/\s.+$/gi, ""))
