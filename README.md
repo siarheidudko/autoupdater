@@ -84,13 +84,13 @@ Package version.
 
 ## Example usage
 
-```
+```yaml
 name: Autoupdate
 on:
   schedule:
     - cron: "* 0/1 * * *"
 concurrency:
-  group: '${{ github.workflow }} @ ${{ github.ref }}'
+  group: "${{ github.workflow }} @ ${{ github.ref }}"
   cancel-in-progress: false
 jobs:
   autoupdate:
@@ -103,13 +103,13 @@ jobs:
 
 Example with publish release and publish package
 
-```
+```yaml
 name: Autoupdate
 on:
   schedule:
     - cron: "0 1 * * *"
 concurrency:
-  group: '${{ github.workflow }} @ ${{ github.ref }}'
+  group: "${{ github.workflow }} @ ${{ github.ref }}"
   cancel-in-progress: false
 jobs:
   update:
@@ -121,15 +121,15 @@ jobs:
         uses: siarheidudko/autoupdater@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          author-email: 'sergey@dudko.dev'
-          author-name: 'Sergey Dudko'
+          author-email: "sergey@dudko.dev"
+          author-name: "Sergey Dudko"
           ref: ${{ github.repository }}
-          branch: 'development'
+          branch: "development"
           working-directory: ${{ github.workspace }}/tmp
-          changelog-file: './CHANGELOG'
-          package-file: './package.json'
-          package-manager: 'yarn'
-          debug: 'true'
+          changelog-file: "./CHANGELOG"
+          package-file: "./package.json"
+          package-manager: "yarn"
+          debug: "true"
           builds-and-checks: |
             npm i yarn -g
             yarn build
@@ -149,7 +149,7 @@ jobs:
         id: set_registry
         uses: actions/setup-node@v3
         with:
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: "https://registry.npmjs.org"
       - name: Install yarn
         id: install_yarn
         run: npm i yarn -g
