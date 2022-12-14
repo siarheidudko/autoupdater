@@ -147,13 +147,13 @@ const { join } = require("path");
     run(
       `npm install ${dependenciesForUpdating
         .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .join(" ")} --save`
+        .join("@latest ")} --save`
     );
     // install outdated dev dependencies
     run(
       `npm install ${devDependenciesForUpdating
         .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .join(" ")} --save-dev`
+        .join("@latest ")} --save-dev`
     );
     // get outdated libs after update
     const outdatedLibs2 = run(`npm outdate`, true)
@@ -173,13 +173,13 @@ const { join } = require("path");
     run(
       `yarn add ${dependenciesForUpdating
         .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .join(" ")}`
+        .join("@latest ")}`
     );
     // install outdated dev dependencies
     run(
       `yarn add ${devDependenciesForUpdating
         .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .join(" ")} --dev`
+        .join("@latest ")} --dev`
     );
     // get outdated libs after update
     const outdatedLibs2 = run(`yarn outdated`, true)
@@ -227,7 +227,7 @@ const { join } = require("path");
     }
 
     // add changes of files
-    // run(`git add --all`);
+    run(`git add --all`);
 
     // change version, make commit and tag
     switch (packageManager) {
