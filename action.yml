@@ -1,5 +1,5 @@
-name: "UpdateDependenciesUpdateLibrary"
-author: "Siarhei Dudko <admin@sergdudko.tk>"
+name: "Autoupdater for dependencies"
+author: "Siarhei Dudko <slavianich@gmail.com>"
 description: "Automatic update of package dependencies with version up"
 inputs:
   token:
