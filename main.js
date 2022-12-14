@@ -78,6 +78,7 @@ const { join } = require("path");
     const resp = spawnSync(com, arg, {
       cwd: dir,
     });
+    if (resp.status !== 0) throw new Error(resp.stderr.toString());
     log(`RESULT: ${resp && resp.output ? resp.output.join("\n") : ""}`);
     return resp.stdout;
   };
@@ -224,7 +225,7 @@ const { join } = require("path");
     }
 
     // add changes of files
-    run(`git add --all`);
+    // run(`git add --all`);
 
     // change version, make commit and tag
     switch (packageManager) {
