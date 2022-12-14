@@ -115,6 +115,8 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      updated: ${{ steps.autoupdate.outputs.updated }}
     steps:
       - name: Autoupdate
         id: autoupdate
@@ -140,7 +142,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: [update]
-    if: ${{ jobs.update.steps.autoupdate.outputs.updated == 'true' }}
+    if: ${{ needs.update.outputs.updated == 'true' }}
     steps:
       - name: Сheckout repo
         id: checkout_repo

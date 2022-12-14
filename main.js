@@ -78,7 +78,7 @@ const { join } = require("path");
     const resp = spawnSync(com, arg, {
       cwd: dir,
     });
-    log(`RESULT: ${resp.output.join("\n")}`);
+    log(`RESULT: ${resp && resp.output ? resp.output.join("\n") : ""}`);
     return resp.stdout;
   };
 
@@ -116,12 +116,16 @@ const { join } = require("path");
    * @type {PackageData}
    */
   let packageData = JSON.parse(packageFile);
-  const dependenciesForUpdating = Object.keys(packageData.dependencies)
-    .filter((e) => ignorePackages.indexOf(e) === -1)
-    .map((e) => `${e}@latest`);
-  const devDependenciesForUpdating = Object.keys(packageData.devDependencies)
-    .filter((e) => ignorePackages.indexOf(e) === -1)
-    .map((e) => `${e}@latest`);
+  const dependenciesForUpdating =
+    Object.keys(packageData.dependencies) ||
+    []
+      .filter((e) => ignorePackages.indexOf(e) === -1)
+      .map((e) => `${e}@latest`);
+  const devDependenciesForUpdating =
+    Object.keys(packageData.devDependencies) ||
+    []
+      .filter((e) => ignorePackages.indexOf(e) === -1)
+      .map((e) => `${e}@latest`);
 
   /**
    * Outdated libs
@@ -195,12 +199,17 @@ const { join } = require("path");
           })
         : Buffer.from("");
       const msg =
-        `# ${packageData.version
-          .split(".")
-          .map((e, ind, arr) =>
-            ind !== arr.length - 1 ? Number.parseInt(e) : Number.parseInt(e) + 1
-          )
-          .join(".")} / ${new Date().toJSON().substring(0, 10)}\n\n` +
+        `# ${
+          packageData.version ||
+          "0.0.0"
+            .split(".")
+            .map((e, ind, arr) =>
+              ind !== arr.length - 1
+                ? Number.parseInt(e)
+                : Number.parseInt(e) + 1
+            )
+            .join(".")
+        } / ${new Date().toJSON().substring(0, 10)}\n\n` +
         `### :tada: Enhancements\n- Updated dependencies: ${outdatedLibs.join(
           ", "
         )}\n\n`;
