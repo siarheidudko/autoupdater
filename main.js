@@ -269,6 +269,9 @@ const { join, normalize } = require("path");
     run(`git push autoupdater --tags`);
   }
 
+  core.log(packageData.version);
+  core.log(dir);
+  core.log(outdatedLibs.length);
   core.setOutput("version", packageData.version);
   core.setOutput("updated", outdatedLibs.length > 0);
   core.setOutput("dir", dir);
