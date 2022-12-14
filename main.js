@@ -227,9 +227,7 @@ const { join, normalize } = require("path");
     }
 
     // add changes of files
-    run(
-      `git add ${join(dir, changelogFilePath)} ${join(dir, packageFilePath)}`
-    );
+    run(`git add --all`);
     run(`git commit -m 'dependencies'`);
 
     // change version, make commit and tag
