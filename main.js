@@ -137,6 +137,8 @@ const { join, normalize } = require("path");
    */
   let outdatedLibs = [];
   if (packageManager === "npm") {
+    // install dependencies
+    run(`npm ci`, true);
     // get outdated libs
     outdatedLibs = run(`npm outdate`, true)
       .toString()
@@ -147,13 +149,15 @@ const { join, normalize } = require("path");
     run(
       `npm install ${dependenciesForUpdating
         .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .join("@latest ")} --save`
+        .map((e) => `${e}@latest`)
+        .join(" ")} --save`
     );
     // install outdated dev dependencies
     run(
       `npm install ${devDependenciesForUpdating
         .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .join("@latest ")} --save-dev`
+        .map((e) => `${e}@latest`)
+        .join(" ")} --save-dev`
     );
     // get outdated libs after update
     const outdatedLibs2 = run(`npm outdate`, true)
@@ -163,6 +167,8 @@ const { join, normalize } = require("path");
       .filter((e) => ["Package", ""].indexOf(e) === -1);
     outdatedLibs = outdatedLibs.filter((e) => outdatedLibs2.indexOf(e) === -1);
   } else if (packageManager === "yarn") {
+    // install dependencies
+    run(`yarn install --frozen-lockfile`, true);
     // get outdated libs
     outdatedLibs = run(`yarn outdated`, true)
       .toString()
@@ -173,13 +179,15 @@ const { join, normalize } = require("path");
     run(
       `yarn add ${dependenciesForUpdating
         .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .join("@latest ")}`
+        .map((e) => `${e}@latest`)
+        .join(" ")}`
     );
     // install outdated dev dependencies
     run(
       `yarn add ${devDependenciesForUpdating
         .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .join("@latest ")} --dev`
+        .map((e) => `${e}@latest`)
+        .join(" ")} --dev`
     );
     // get outdated libs after update
     const outdatedLibs2 = run(`yarn outdated`, true)
