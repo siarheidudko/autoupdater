@@ -257,9 +257,7 @@ const { join, normalize } = require("path");
 
     // reload package data
     packageFile = readFileSync(join(dir, packageFilePath)).toString();
-    core.info(packageFile);
-    packageData = JSON.stringify(packageFile);
-    core.info(JSON.stringify(packageData));
+    packageData = JSON.parse(packageFile);
 
     // run user stages before push
     buildsAndChecks.forEach((command) => {
@@ -271,9 +269,6 @@ const { join, normalize } = require("path");
     run(`git push autoupdater --tags`);
   }
 
-  core.info(packageData.version);
-  core.info(dir);
-  core.info(outdatedLibs.length);
   core.setOutput("version", packageData.version);
   core.setOutput("updated", outdatedLibs.length > 0);
   core.setOutput("dir", dir);
