@@ -99,7 +99,7 @@ jobs:
     steps:
       - name: Autoupdate
         id: autoupdate
-        uses: siarheidudko/autoupdater@v2
+        uses: siarheidudko/autoupdater@v3
 ```
 
 Example with publish release and publish package
@@ -134,7 +134,7 @@ jobs:
         working-directory: ${{ github.workspace }}/tmp
       - name: Autoupdate
         id: autoupdate
-        uses: siarheidudko/autoupdater@v2
+        uses: siarheidudko/autoupdater@v3
         with:
           author-email: "actions@github.com"
           author-name: "Sergey Dudko"
