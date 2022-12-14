@@ -218,8 +218,8 @@ const { join, normalize } = require("path");
         : Buffer.from("");
       const msg =
         `# ${
-          packageData.version ||
-          "0.0.0"
+          packageData.version + 1 ||
+          "0.0.1"
             .split(".")
             .map((e, ind, arr) =>
               ind !== arr.length - 1
