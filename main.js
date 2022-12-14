@@ -70,15 +70,17 @@ const { join } = require("path");
    * Run the command
    *
    * @param {string} str - command to execute
+   * @param {boolean} ignoreExitCode - ignore exit code
    */
-  const run = (str) => {
+  const run = (str, ignoreExitCode = false) => {
     log(`RUN ${str}`);
     const arg = str.split(" ");
     const com = arg.shift();
     const resp = spawnSync(com, arg, {
       cwd: dir,
     });
-    if (resp.status !== 0) throw new Error(resp.stderr.toString());
+    if (resp.status !== 0 && !ignoreExitCode)
+      throw new Error(resp.stderr.toString());
     log(`RESULT: ${resp && resp.output ? resp.output.join("\n") : ""}`);
     return resp.stdout;
   };
@@ -136,7 +138,7 @@ const { join } = require("path");
   let outdatedLibs = [];
   if (packageManager === "npm") {
     // get outdated libs
-    outdatedLibs = run(`npm outdate`)
+    outdatedLibs = run(`npm outdate`, true)
       .toString()
       .split("\n")
       .map((e) => e.replace(/\s.+$/gi, ""))
@@ -154,7 +156,7 @@ const { join } = require("path");
         .join(" ")} --save-dev`
     );
     // get outdated libs after update
-    const outdatedLibs2 = run(`npm outdate`)
+    const outdatedLibs2 = run(`npm outdate`, true)
       .toString()
       .split("\n")
       .map((e) => e.replace(/\s.+$/gi, ""))
@@ -162,7 +164,7 @@ const { join } = require("path");
     outdatedLibs = outdatedLibs.filter((e) => outdatedLibs2.indexOf(e) === -1);
   } else if (packageManager === "yarn") {
     // get outdated libs
-    outdatedLibs = run(`yarn outdated`)
+    outdatedLibs = run(`yarn outdated`, true)
       .toString()
       .split("\n")
       .map((e) => e.replace(/\s.+$/gi, ""))
@@ -180,7 +182,7 @@ const { join } = require("path");
         .join(" ")} --dev`
     );
     // get outdated libs after update
-    const outdatedLibs2 = run(`yarn outdated`)
+    const outdatedLibs2 = run(`yarn outdated`, true)
       .toString()
       .split("\n")
       .map((e) => e.replace(/\s.+$/gi, ""))
