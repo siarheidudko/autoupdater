@@ -119,17 +119,12 @@ const { join, normalize } = require("path");
    * @type {PackageData}
    */
   let packageData = JSON.parse(packageFile);
-  const dependenciesForUpdating = packageData.dependencies
-    ? Object.keys(packageData.dependencies)
-    : []
-        .filter((e) => ignorePackages.indexOf(e) === -1)
-        .map((e) => `${e}@latest`);
-  const devDependenciesForUpdating = packageData.devDependencies
-    ? Object.keys(packageData.devDependencies)
-    : []
-        .filter((e) => ignorePackages.indexOf(e) === -1)
-        .map((e) => `${e}@latest`);
-
+  let dependenciesForUpdating = (
+    packageData.dependencies ? Object.keys(packageData.dependencies) : []
+  ).filter((e) => ignorePackages.indexOf(e) === -1);
+  let devDependenciesForUpdating = (
+    packageData.devDependencies ? Object.keys(packageData.devDependencies) : []
+  ).filter((e) => ignorePackages.indexOf(e) === -1);
   /**
    * Outdated libs
    *
@@ -145,20 +140,26 @@ const { join, normalize } = require("path");
       .split("\n")
       .map((e) => e.replace(/\s.+$/gi, ""))
       .filter((e) => ["Package", ""].indexOf(e) === -1);
+    dependenciesForUpdating = dependenciesForUpdating.filter(
+      (e) => outdatedLibs.indexOf(e) !== -1
+    );
+    devDependenciesForUpdating = devDependenciesForUpdating.filter(
+      (e) => outdatedLibs.indexOf(e) !== -1
+    );
     // install outdated dependencies
-    run(
-      `npm install ${dependenciesForUpdating
-        .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .map((e) => `${e}@latest`)
-        .join(" ")} --save`
-    );
+    if (dependenciesForUpdating.length > 0)
+      run(
+        `npm install ${dependenciesForUpdating
+          .map((e) => `${e}@latest`)
+          .join(" ")} --save`
+      );
     // install outdated dev dependencies
-    run(
-      `npm install ${devDependenciesForUpdating
-        .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .map((e) => `${e}@latest`)
-        .join(" ")} --save-dev`
-    );
+    if (devDependenciesForUpdating.length > 0)
+      run(
+        `npm install ${devDependenciesForUpdating
+          .map((e) => `${e}@latest`)
+          .join(" ")} --save-dev`
+      );
     // get outdated libs after update
     const outdatedLibs2 = run(`npm outdate`, true)
       .toString()
@@ -175,20 +176,26 @@ const { join, normalize } = require("path");
       .split("\n")
       .map((e) => e.replace(/\s.+$/gi, ""))
       .filter((e) => ["yarn", "info", "Package", "", "Done"].indexOf(e) === -1);
+    dependenciesForUpdating = dependenciesForUpdating.filter(
+      (e) => outdatedLibs.indexOf(e) !== -1
+    );
+    devDependenciesForUpdating = devDependenciesForUpdating.filter(
+      (e) => outdatedLibs.indexOf(e) !== -1
+    );
     // install outdated dependencies
-    run(
-      `yarn add ${dependenciesForUpdating
-        .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .map((e) => `${e}@latest`)
-        .join(" ")}`
-    );
+    if (dependenciesForUpdating.length > 0)
+      run(
+        `yarn add ${dependenciesForUpdating
+          .map((e) => `${e}@latest`)
+          .join(" ")}`
+      );
     // install outdated dev dependencies
-    run(
-      `yarn add ${devDependenciesForUpdating
-        .filter((e) => outdatedLibs.indexOf(e) !== -1)
-        .map((e) => `${e}@latest`)
-        .join(" ")} --dev`
-    );
+    if (devDependenciesForUpdating.length > 0)
+      run(
+        `yarn add ${devDependenciesForUpdating
+          .map((e) => `${e}@latest`)
+          .join(" ")} --dev`
+      );
     // get outdated libs after update
     const outdatedLibs2 = run(`yarn outdated`, true)
       .toString()
