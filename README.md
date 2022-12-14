@@ -118,6 +118,11 @@ jobs:
     outputs:
       updated: ${{ steps.autoupdate.outputs.updated }}
     steps:
+      - name: Сheckout repo
+        id: checkout_repo
+        uses: actions/checkout@v3
+        with:
+          path: "tmp"
       - name: Autoupdate
         id: autoupdate
         uses: siarheidudko/autoupdater@v2

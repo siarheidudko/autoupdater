@@ -101,7 +101,7 @@ const { join } = require("path");
   run(`git fetch autoupdater`);
 
   // Checkout branch of the repository
-  run(`git checkout autoupdater ${branch}`);
+  run(`git checkout ${branch}`);
 
   let packageFile = readFileSync(join(dir, packageFilePath)).toString();
   /**
