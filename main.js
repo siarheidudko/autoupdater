@@ -257,7 +257,9 @@ const { join, normalize } = require("path");
 
     // reload package data
     packageFile = readFileSync(join(dir, packageFilePath)).toString();
+    core.info(packageFile);
     packageData = JSON.stringify(packageFile);
+    core.info(JSON.stringify(packageData));
 
     // run user stages before push
     buildsAndChecks.forEach((command) => {
