@@ -116,16 +116,16 @@ const { join } = require("path");
    * @type {PackageData}
    */
   let packageData = JSON.parse(packageFile);
-  const dependenciesForUpdating =
-    Object.keys(packageData.dependencies) ||
-    []
-      .filter((e) => ignorePackages.indexOf(e) === -1)
-      .map((e) => `${e}@latest`);
-  const devDependenciesForUpdating =
-    Object.keys(packageData.devDependencies) ||
-    []
-      .filter((e) => ignorePackages.indexOf(e) === -1)
-      .map((e) => `${e}@latest`);
+  const dependenciesForUpdating = packageData.dependencies
+    ? Object.keys(packageData.dependencies)
+    : []
+        .filter((e) => ignorePackages.indexOf(e) === -1)
+        .map((e) => `${e}@latest`);
+  const devDependenciesForUpdating = packageData.devDependencies
+    ? Object.keys(packageData.devDependencies)
+    : []
+        .filter((e) => ignorePackages.indexOf(e) === -1)
+        .map((e) => `${e}@latest`);
 
   /**
    * Outdated libs
