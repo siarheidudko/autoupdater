@@ -250,7 +250,7 @@ const { join, normalize } = require("path");
     });
 
     // push changes and tags
-    run(`git push autoupdater`);
+    run(`git push autoupdater ${branch}`);
     run(`git push autoupdater --tags`);
   }
 
