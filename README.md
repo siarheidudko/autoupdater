@@ -136,8 +136,8 @@ jobs:
         id: autoupdate
         uses: siarheidudko/autoupdater@v2
         with:
-          author-email: "slavianich@gmail.com"
-          author-name: "Siarhei Dudko"
+          author-email: "actions@github.com"
+          author-name: "Sergey Dudko"
           working-directory: ${{ github.workspace }}/tmp
           ref: ${{ github.repository }}
           branch: "main"
