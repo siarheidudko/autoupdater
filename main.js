@@ -223,6 +223,9 @@ const { join } = require("path");
       );
     }
 
+    // add changes of files
+    run(`git add --all`);
+
     // change version, make commit and tag
     switch (packageManager) {
       case "npm":
