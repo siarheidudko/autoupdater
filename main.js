@@ -3,7 +3,7 @@
 const core = require("@actions/core");
 const { readFileSync, writeFileSync, mkdtempSync, existsSync } = require("fs");
 const { spawnSync } = require("child_process");
-const { join } = require("path");
+const { join, normalize } = require("path");
 
 (async () => {
   /**
@@ -227,7 +227,10 @@ const { join } = require("path");
     }
 
     // add changes of files
-    run(`git add --all`);
+    run(
+      `git add ${join(dir, changelogFilePath)} ${join(dir, packageFilePath)}`
+    );
+    run(`git commit -m 'dependencies'`);
 
     // change version, make commit and tag
     switch (packageManager) {
