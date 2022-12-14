@@ -88,7 +88,7 @@ Package version.
 name: Autoupdate
 on:
   schedule:
-    - cron: "* 0/1 * * *"
+    - cron: "* 1 * * *"
 concurrency:
   group: "${{ github.workflow }} @ ${{ github.ref }}"
   cancel-in-progress: false
@@ -98,6 +98,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Autoupdate
+        id: autoupdate
         uses: siarheidudko/autoupdater@v2
 ```
 
@@ -113,58 +114,84 @@ concurrency:
   cancel-in-progress: false
 jobs:
   update:
+    env:
+      SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     outputs:
       updated: ${{ steps.autoupdate.outputs.updated }}
+      version: ${{ steps.autoupdate.outputs.version }}
     steps:
       - name: Сheckout repo
         id: checkout_repo
         uses: actions/checkout@v3
         with:
           path: "tmp"
+          ref: "main"
+      - name: Set service account
+        id: set_service_account
+        run: echo $SERVICE_ACCOUNT>serviceAccount.json
+        working-directory: ${{ github.workspace }}/tmp
       - name: Autoupdate
         id: autoupdate
         uses: siarheidudko/autoupdater@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          author-email: "sergey@dudko.dev"
-          author-name: "Sergey Dudko"
-          ref: ${{ github.repository }}
-          branch: "development"
+          author-email: "slavianich@gmail.com"
+          author-name: "Siarhei Dudko"
           working-directory: ${{ github.workspace }}/tmp
-          changelog-file: "./CHANGELOG"
-          package-file: "./package.json"
-          package-manager: "yarn"
-          debug: "true"
+          ref: ${{ github.repository }}
+          branch: "main"
           builds-and-checks: |
-            npm i yarn -g
-            yarn build
-            yarn test
-          ignore-packages: |
-            @types/node
+            npm test
   release:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    env:
+      NODE_VERSION: 16
+      VERSION: ${{ needs.update.outputs.version }}
     needs: [update]
     if: ${{ needs.update.outputs.updated == 'true' }}
     steps:
       - name: Сheckout repo
         id: checkout_repo
         uses: actions/checkout@v3
-      - name: Set registry npm packages
-        id: set_registry
+        with:
+          ref: "main"
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        id: setup_node
         uses: actions/setup-node@v3
         with:
+          node-version: ${{ env.NODE_VERSION }}
           registry-url: "https://registry.npmjs.org"
-      - name: Install yarn
-        id: install_yarn
-        run: npm i yarn -g
-      - name: Build package
-        id: build_package
-        run: yarn build
+      - name: Cache node modules
+        id: use_cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Install modules
+        id: install_modules
+        run: npm ci
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
+          body: |
+            see [CHANGELOG.md](https://github.com/siarheidudko/firebase-admin-cli/blob/main/CHANGELOG.md)
+          draft: false
+          prerelease: false
       - name: Publish package to NPM
-        id: publish_package_npm
+        id: npm_publish
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
