@@ -217,17 +217,12 @@ const { join, normalize } = require("path");
           })
         : Buffer.from("");
       const msg =
-        `# ${
-          packageData.version + 1 ||
-          "0.0.1"
-            .split(".")
-            .map((e, ind, arr) =>
-              ind !== arr.length - 1
-                ? Number.parseInt(e)
-                : Number.parseInt(e) + 1
-            )
-            .join(".")
-        } / ${new Date().toJSON().substring(0, 10)}\n\n` +
+        `# ${(packageData.version || "0.0.1")
+          .split(".")
+          .map((e, ind, arr) =>
+            ind !== arr.length - 1 ? Number.parseInt(e) : Number.parseInt(e) + 1
+          )
+          .join(".")} / ${new Date().toJSON().substring(0, 10)}\n\n` +
         `### :tada: Enhancements\n- Updated dependencies: ${outdatedLibs.join(
           ", "
         )}\n\n`;
