@@ -30,6 +30,6 @@
   },
   "homepage": "https://github.com/siarheidudko/autoupdater#readme",
   "dependencies": {
-    "@actions/core": "^1.10.0"
+    "@actions/core": "^1.11.1"
   }
 }

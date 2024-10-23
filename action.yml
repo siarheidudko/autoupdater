@@ -50,7 +50,7 @@ outputs:
   version:
     description: "Package version."
 runs:
-  using: "node16"
+  using: "node20"
   main: "main.js"
   post: "cleanup.js"
 branding:

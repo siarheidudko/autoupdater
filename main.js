@@ -3,7 +3,7 @@
 const core = require("@actions/core");
 const { readFileSync, writeFileSync, mkdtempSync, existsSync } = require("fs");
 const { spawnSync } = require("child_process");
-const { join, normalize } = require("path");
+const { join } = require("path");
 
 (async () => {
   /**
