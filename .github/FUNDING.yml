@@ -1,2 +1,7 @@
 patreon: dudko_dev
-custom: ["https://paypal.me/dudkodev", "https://www.buymeacoffee.com/dudko.dev"]
+custom:
+  [
+    "https://paypal.me/dudkodev",
+    "https://www.buymeacoffee.com/dudko.dev",
+    "https://dudko.dev/donate",
+  ]

@@ -51,8 +51,8 @@ outputs:
     description: "Package version."
 runs:
   using: "node24"
-  main: "main.js"
-  post: "cleanup.js"
+  main: "src/index.js"
+  post: "src/services/cleanup-service.js"
 branding:
   icon: "arrow-right-circle"
   color: "green"

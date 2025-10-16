@@ -2,9 +2,39 @@
   "name": "autoupdater",
   "version": "5.0.0",
   "description": "Automatic update of package dependencies with version up",
-  "main": "autoupdater.js",
+  "main": "src/index.js",
+  "author": {
+    "name": "Siarhei Dudko",
+    "email": "siarhei@dudko.dev",
+    "url": "https://dudko.dev"
+  },
+  "funding": [
+    {
+      "type": "individual",
+      "url": "http://dudko.dev/donate"
+    },
+    {
+      "type": "buymeacoffee",
+      "url": "https://www.buymeacoffee.com/dudko.dev"
+    },
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/dudkodev"
+    },
+    {
+      "type": "patreon",
+      "url": "https://patreon.com/dudko_dev"
+    }
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/siarheidudko/autoupdater/issues"
+  },
+  "homepage": "https://github.com/siarheidudko/autoupdater#readme",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test tests/**/*.test.js",
+    "test:watch": "node --test --watch tests/**/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage tests/**/*.test.js"
   },
   "repository": {
     "type": "git",
@@ -23,12 +53,6 @@
     "dependencies",
     "dependabot"
   ],
-  "author": "Siarhei Dudko <slavianich@gmail.com>",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/siarheidudko/autoupdater/issues"
-  },
-  "homepage": "https://github.com/siarheidudko/autoupdater#readme",
   "dependencies": {
     "@actions/core": "^1.11.1"
   }

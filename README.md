@@ -1,6 +1,15 @@
-# Autoupdater for dependencies (Node JS)
+# Autoupdater for Dependencies (Node.js)
 
-This action check update and outdate dependencies, update they and incremented package version (patch) on 1, if dependencies were updated.
+A GitHub Action that automatically checks for outdated dependencies, updates them, and increments the package version when dependencies are updated. Built with modern modular architecture and comprehensive testing.
+
+## Features
+
+- **Multi-package manager support**: npm, pnpm, and yarn
+- **Automatic version bumping**: Increments patch version when dependencies are updated
+- **Script runner**: runs custom scripts before pushing changes
+- **Changelog generation**: Automatically updates CHANGELOG.md with changes
+- **Git operations**: Commits and pushes changes with proper tagging
+- **Debug support**: Detailed logging for troubleshooting
 
 ## Inputs
 
@@ -124,7 +133,7 @@ jobs:
     steps:
       - name: Сheckout repo
         id: checkout_repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           path: "tmp"
           ref: "main"
@@ -134,7 +143,7 @@ jobs:
         working-directory: ${{ github.workspace }}/tmp
       - name: Autoupdate
         id: autoupdate
-        uses: siarheidudko/autoupdater@v3
+        uses: siarheidudko/autoupdater@v6
         with:
           author-email: "actions@github.com"
           author-name: "Sergey Dudko"
@@ -154,12 +163,12 @@ jobs:
     steps:
       - name: Сheckout repo
         id: checkout_repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           ref: "main"
       - name: Use Node.js ${{ env.NODE_VERSION }}
         id: setup_node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: "https://registry.npmjs.org"
