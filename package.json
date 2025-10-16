@@ -1,6 +1,6 @@
 {
   "name": "autoupdater",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "description": "Automatic update of package dependencies with version up",
   "main": "src/index.js",
   "author": {
