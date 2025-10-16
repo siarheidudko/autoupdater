@@ -33,7 +33,7 @@ inputs:
     description: "Path to package.json file."
     default: "./package.json"
   package-manager:
-    description: "Package manager (npm or yarn)."
+    description: "Package manager (npm, pnpm, or yarn)."
     default: "npm"
   debug:
     description: "Show debugging log."
@@ -50,7 +50,7 @@ outputs:
   version:
     description: "Package version."
 runs:
-  using: "node20"
+  using: "node24"
   main: "main.js"
   post: "cleanup.js"
 branding:

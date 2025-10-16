@@ -40,7 +40,7 @@ Path to package.json file, default: `./package.json`.
 
 ### `package-manager`
 
-Package manager (npm or yarn), default: `npm`.
+Package manager (npm, pnpm or yarn), default: `npm`.
 
 ### `debug`
 

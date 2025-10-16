@@ -39,7 +39,7 @@ const { join } = require("path");
    */
   const packageFilePath = core.getInput("package-file") || "./package.json";
   /**
-   * package manager like `npm` or `yarn`
+   * package manager like `npm`, `pnpm` or `yarn`
    */
   const packageManager = core.getInput("package-manager") || "npm";
   /**
@@ -84,6 +84,9 @@ const { join } = require("path");
     log(`RESULT: ${resp && resp.output ? resp.output.join("\n") : ""}`);
     return resp.stdout;
   };
+
+  // install yarn if it needs
+  if (packageManager === "pnpm") run(`npm install pnpm -g`);
 
   // install yarn if it needs
   if (packageManager === "yarn") run(`npm install yarn -g`);
@@ -131,80 +134,123 @@ const { join } = require("path");
    * @type {Array<string>}
    */
   let outdatedLibs = [];
-  if (packageManager === "npm") {
-    // install dependencies
-    run(`npm ci`, true);
-    // get outdated libs
-    outdatedLibs = run(`npm outdate`, true)
-      .toString()
-      .split("\n")
-      .map((e) => e.replace(/\s.+$/gi, ""))
-      .filter((e) => ["Package", ""].indexOf(e) === -1);
-    dependenciesForUpdating = dependenciesForUpdating.filter(
-      (e) => outdatedLibs.indexOf(e) !== -1
-    );
-    devDependenciesForUpdating = devDependenciesForUpdating.filter(
-      (e) => outdatedLibs.indexOf(e) !== -1
-    );
-    // install outdated dependencies
-    if (dependenciesForUpdating.length > 0)
-      run(
-        `npm install ${dependenciesForUpdating
-          .map((e) => `${e}@latest`)
-          .join(" ")} --save`
+  switch (packageManager) {
+    case "npm": {
+      // install dependencies
+      run(`npm ci`, true);
+      // get outdated libs
+      outdatedLibs = Object.keys(
+        JSON.parse(run(`npm outdated --json`, true).toString())
       );
-    // install outdated dev dependencies
-    if (devDependenciesForUpdating.length > 0)
-      run(
-        `npm install ${devDependenciesForUpdating
-          .map((e) => `${e}@latest`)
-          .join(" ")} --save-dev`
+      dependenciesForUpdating = dependenciesForUpdating.filter(
+        (e) => outdatedLibs.indexOf(e) !== -1
       );
-    // get outdated libs after update
-    const outdatedLibs2 = run(`npm outdate`, true)
-      .toString()
-      .split("\n")
-      .map((e) => e.replace(/\s.+$/gi, ""))
-      .filter((e) => ["Package", ""].indexOf(e) === -1);
-    outdatedLibs = outdatedLibs.filter((e) => outdatedLibs2.indexOf(e) === -1);
-  } else if (packageManager === "yarn") {
-    // install dependencies
-    run(`yarn install --frozen-lockfile`, true);
-    // get outdated libs
-    outdatedLibs = run(`yarn outdated`, true)
-      .toString()
-      .split("\n")
-      .map((e) => e.replace(/\s.+$/gi, ""))
-      .filter((e) => ["yarn", "info", "Package", "", "Done"].indexOf(e) === -1);
-    dependenciesForUpdating = dependenciesForUpdating.filter(
-      (e) => outdatedLibs.indexOf(e) !== -1
-    );
-    devDependenciesForUpdating = devDependenciesForUpdating.filter(
-      (e) => outdatedLibs.indexOf(e) !== -1
-    );
-    // install outdated dependencies
-    if (dependenciesForUpdating.length > 0)
-      run(
-        `yarn add ${dependenciesForUpdating
-          .map((e) => `${e}@latest`)
-          .join(" ")}`
+      devDependenciesForUpdating = devDependenciesForUpdating.filter(
+        (e) => outdatedLibs.indexOf(e) !== -1
       );
-    // install outdated dev dependencies
-    if (devDependenciesForUpdating.length > 0)
-      run(
-        `yarn add ${devDependenciesForUpdating
-          .map((e) => `${e}@latest`)
-          .join(" ")} --dev`
+      // install outdated dependencies
+      if (dependenciesForUpdating.length > 0)
+        run(
+          `npm install ${dependenciesForUpdating
+            .map((e) => `${e}@latest`)
+            .join(" ")} --save`
+        );
+      // install outdated dev dependencies
+      if (devDependenciesForUpdating.length > 0)
+        run(
+          `npm install ${devDependenciesForUpdating
+            .map((e) => `${e}@latest`)
+            .join(" ")} --save-dev`
+        );
+      // get outdated libs after update
+      const outdatedLibs2 = Object.keys(
+        JSON.parse(run(`npm outdated --json`, true).toString())
       );
-    // get outdated libs after update
-    const outdatedLibs2 = run(`yarn outdated`, true)
-      .toString()
-      .split("\n")
-      .map((e) => e.replace(/\s.+$/gi, ""))
-      .filter((e) => ["yarn", "info", "Package", "", "Done"].indexOf(e) === -1);
-    outdatedLibs = outdatedLibs.filter((e) => outdatedLibs2.indexOf(e) === -1);
-  } else {
-    throw new Error("Invalid package manager name, use npm or yarn.");
+      outdatedLibs = outdatedLibs.filter(
+        (e) => outdatedLibs2.indexOf(e) === -1
+      );
+      break;
+    }
+    case "pnpm": {
+      // install dependencies
+      run(`pnpm install --frozen-lockfile`, true);
+      // get outdated libs
+      outdatedLibs = Object.keys(
+        JSON.parse(run(`pnpm outdated --format json`, true).toString())
+      );
+      dependenciesForUpdating = dependenciesForUpdating.filter(
+        (e) => outdatedLibs.indexOf(e) !== -1
+      );
+      devDependenciesForUpdating = devDependenciesForUpdating.filter(
+        (e) => outdatedLibs.indexOf(e) !== -1
+      );
+      // install outdated dependencies
+      if (dependenciesForUpdating.length > 0)
+        run(
+          `pnpm install ${dependenciesForUpdating
+            .map((e) => `${e}@latest`)
+            .join(" ")}`
+        );
+      // install outdated dev dependencies
+      if (devDependenciesForUpdating.length > 0)
+        run(
+          `pnpm install ${devDependenciesForUpdating
+            .map((e) => `${e}@latest`)
+            .join(" ")} --dev`
+        );
+      // get outdated libs after update
+      const outdatedLibs2 = Object.keys(
+        JSON.parse(run(`pnpm outdated --format json`, true).toString())
+      );
+      outdatedLibs = outdatedLibs.filter(
+        (e) => outdatedLibs2.indexOf(e) === -1
+      );
+      break;
+    }
+    case "yarn": {
+      // install dependencies
+      run(`yarn install --frozen-lockfile`, true);
+      // get outdated libs
+      outdatedLibs = run(`yarn outdated --json`, true)
+        .toString()
+        .split("\n")
+        .map((e) => JSON.parse(e))
+        .filter((e) => e?.type === "table")
+        .flatMap((e) => e.data.body.map((f) => f[0]));
+      dependenciesForUpdating = dependenciesForUpdating.filter(
+        (e) => outdatedLibs.indexOf(e) !== -1
+      );
+      devDependenciesForUpdating = devDependenciesForUpdating.filter(
+        (e) => outdatedLibs.indexOf(e) !== -1
+      );
+      // install outdated dependencies
+      if (dependenciesForUpdating.length > 0)
+        run(
+          `yarn add ${dependenciesForUpdating
+            .map((e) => `${e}@latest`)
+            .join(" ")}`
+        );
+      // install outdated dev dependencies
+      if (devDependenciesForUpdating.length > 0)
+        run(
+          `yarn add ${devDependenciesForUpdating
+            .map((e) => `${e}@latest`)
+            .join(" ")} --dev`
+        );
+      // get outdated libs after update
+      const outdatedLibs2 = run(`yarn outdated --json`, true)
+        .toString()
+        .split("\n")
+        .map((e) => JSON.parse(e))
+        .filter((e) => e?.type === "table")
+        .flatMap((e) => e.data.body.map((f) => f[0]));
+      outdatedLibs = outdatedLibs.filter(
+        (e) => outdatedLibs2.indexOf(e) === -1
+      );
+      break;
+    }
+    default:
+      throw new Error("Invalid package manager name, use npm, pnpm or yarn.");
   }
 
   if (outdatedLibs.length > 0) {
@@ -244,6 +290,9 @@ const { join } = require("path");
     switch (packageManager) {
       case "npm":
         run(`npm version patch`);
+        break;
+      case "pnpm":
+        run(`pnpm version patch`);
         break;
       case "yarn":
         run(`yarn version --new-version patch`);
