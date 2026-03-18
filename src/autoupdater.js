@@ -49,7 +49,9 @@ class AutoUpdater {
 
       if (
         filteredPackages.dependencies.length === 0 &&
-        filteredPackages.devDependencies.length === 0
+        filteredPackages.devDependencies.length === 0 &&
+        filteredPackages.peerDependencies.length === 0 &&
+        filteredPackages.optionalDependencies.length === 0
       ) {
         this.logger.info("No packages to update");
         return {
@@ -62,7 +64,9 @@ class AutoUpdater {
       // Update packages
       this.packageManagerService.updatePackages(
         filteredPackages.dependencies,
-        filteredPackages.devDependencies
+        filteredPackages.devDependencies,
+        filteredPackages.peerDependencies,
+        filteredPackages.optionalDependencies
       );
 
       // Verify which packages were actually updated
@@ -148,26 +152,38 @@ class AutoUpdater {
    * @private
    * @param {Object} packageData - Package.json data
    * @param {string[]} outdatedPackages - List of outdated packages
-   * @returns {{dependencies: string[], devDependencies: string[]}} Filtered packages
+   * @returns {{dependencies: string[], devDependencies: string[], peerDependencies: string[], optionalDependencies: string[]}} Filtered packages
    */
   _filterPackages(packageData, outdatedPackages) {
     const ignorePackages = this.config.get("ignorePackages");
 
+    const filterPkg = (pkg) =>
+      ignorePackages.indexOf(pkg) === -1 &&
+      outdatedPackages.indexOf(pkg) !== -1;
+
     const dependencies = (
       packageData.dependencies ? Object.keys(packageData.dependencies) : []
-    )
-      .filter((pkg) => ignorePackages.indexOf(pkg) === -1)
-      .filter((pkg) => outdatedPackages.indexOf(pkg) !== -1);
+    ).filter(filterPkg);
 
     const devDependencies = (
       packageData.devDependencies
         ? Object.keys(packageData.devDependencies)
         : []
-    )
-      .filter((pkg) => ignorePackages.indexOf(pkg) === -1)
-      .filter((pkg) => outdatedPackages.indexOf(pkg) !== -1);
+    ).filter(filterPkg);
 
-    return { dependencies, devDependencies };
+    const peerDependencies = (
+      packageData.peerDependencies
+        ? Object.keys(packageData.peerDependencies)
+        : []
+    ).filter(filterPkg);
+
+    const optionalDependencies = (
+      packageData.optionalDependencies
+        ? Object.keys(packageData.optionalDependencies)
+        : []
+    ).filter(filterPkg);
+
+    return { dependencies, devDependencies, peerDependencies, optionalDependencies };
   }
 
   /**

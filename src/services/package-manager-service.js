@@ -64,17 +64,19 @@ class PackageManagerService {
    * Update packages
    * @param {string[]} dependencies - Regular dependencies to update
    * @param {string[]} devDependencies - Dev dependencies to update
+   * @param {string[]} peerDependencies - Peer dependencies to update
+   * @param {string[]} optionalDependencies - Optional dependencies to update
    */
-  updatePackages(dependencies, devDependencies) {
+  updatePackages(dependencies, devDependencies, peerDependencies = [], optionalDependencies = []) {
     switch (this.packageManager) {
       case "npm":
-        this._updateNpmPackages(dependencies, devDependencies);
+        this._updateNpmPackages(dependencies, devDependencies, peerDependencies, optionalDependencies);
         break;
       case "pnpm":
-        this._updatePnpmPackages(dependencies, devDependencies);
+        this._updatePnpmPackages(dependencies, devDependencies, peerDependencies, optionalDependencies);
         break;
       case "yarn":
-        this._updateYarnPackages(dependencies, devDependencies);
+        this._updateYarnPackages(dependencies, devDependencies, peerDependencies, optionalDependencies);
         break;
       default:
         throw new Error(`Unsupported package manager: ${this.packageManager}`);
@@ -130,8 +132,10 @@ class PackageManagerService {
    * @private
    * @param {string[]} dependencies - Regular dependencies
    * @param {string[]} devDependencies - Dev dependencies
+   * @param {string[]} peerDependencies - Peer dependencies
+   * @param {string[]} optionalDependencies - Optional dependencies
    */
-  _updateNpmPackages(dependencies, devDependencies) {
+  _updateNpmPackages(dependencies, devDependencies, peerDependencies = [], optionalDependencies = []) {
     if (dependencies.length > 0) {
       const packages = dependencies.map((pkg) => `${pkg}@latest`).join(" ");
       this.commandRunner.run(`npm install ${packages} --save`);
@@ -141,6 +145,16 @@ class PackageManagerService {
       const packages = devDependencies.map((pkg) => `${pkg}@latest`).join(" ");
       this.commandRunner.run(`npm install ${packages} --save-dev`);
     }
+
+    if (peerDependencies.length > 0) {
+      const packages = peerDependencies.map((pkg) => `${pkg}@latest`).join(" ");
+      this.commandRunner.run(`npm install ${packages} --save-peer`);
+    }
+
+    if (optionalDependencies.length > 0) {
+      const packages = optionalDependencies.map((pkg) => `${pkg}@latest`).join(" ");
+      this.commandRunner.run(`npm install ${packages} --save-optional`);
+    }
   }
 
   /**
@@ -148,8 +162,10 @@ class PackageManagerService {
    * @private
    * @param {string[]} dependencies - Regular dependencies
    * @param {string[]} devDependencies - Dev dependencies
+   * @param {string[]} peerDependencies - Peer dependencies
+   * @param {string[]} optionalDependencies - Optional dependencies
    */
-  _updatePnpmPackages(dependencies, devDependencies) {
+  _updatePnpmPackages(dependencies, devDependencies, peerDependencies = [], optionalDependencies = []) {
     if (dependencies.length > 0) {
       const packages = dependencies.map((pkg) => `${pkg}@latest`).join(" ");
       this.commandRunner.run(`pnpm install ${packages}`);
@@ -159,6 +175,16 @@ class PackageManagerService {
       const packages = devDependencies.map((pkg) => `${pkg}@latest`).join(" ");
       this.commandRunner.run(`pnpm install ${packages} --dev`);
     }
+
+    if (peerDependencies.length > 0) {
+      const packages = peerDependencies.map((pkg) => `${pkg}@latest`).join(" ");
+      this.commandRunner.run(`pnpm install ${packages} --save-peer`);
+    }
+
+    if (optionalDependencies.length > 0) {
+      const packages = optionalDependencies.map((pkg) => `${pkg}@latest`).join(" ");
+      this.commandRunner.run(`pnpm install ${packages} --save-optional`);
+    }
   }
 
   /**
@@ -166,8 +192,10 @@ class PackageManagerService {
    * @private
    * @param {string[]} dependencies - Regular dependencies
    * @param {string[]} devDependencies - Dev dependencies
+   * @param {string[]} peerDependencies - Peer dependencies
+   * @param {string[]} optionalDependencies - Optional dependencies
    */
-  _updateYarnPackages(dependencies, devDependencies) {
+  _updateYarnPackages(dependencies, devDependencies, peerDependencies = [], optionalDependencies = []) {
     if (dependencies.length > 0) {
       const packages = dependencies.map((pkg) => `${pkg}@latest`).join(" ");
       this.commandRunner.run(`yarn add ${packages}`);
@@ -176,6 +204,16 @@ class PackageManagerService {
     if (devDependencies.length > 0) {
       const packages = devDependencies.map((pkg) => `${pkg}@latest`).join(" ");
       this.commandRunner.run(`yarn add ${packages} --dev`);
+    }
+
+    if (peerDependencies.length > 0) {
+      const packages = peerDependencies.map((pkg) => `${pkg}@latest`).join(" ");
+      this.commandRunner.run(`yarn add ${packages} --peer`);
+    }
+
+    if (optionalDependencies.length > 0) {
+      const packages = optionalDependencies.map((pkg) => `${pkg}@latest`).join(" ");
+      this.commandRunner.run(`yarn add ${packages} --optional`);
     }
   }
 }

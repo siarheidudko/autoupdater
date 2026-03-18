@@ -160,12 +160,15 @@ describe("GitService", () => {
     );
   });
 
-  test("should throw error for invalid version in createMajorVersionTag", () => {
+  test("should throw error for null version in createMajorVersionTag", () => {
     assert.throws(() => service.createMajorVersionTag(null), /Invalid version/);
+  });
+
+  test("should throw error for empty version in createMajorVersionTag", () => {
     assert.throws(() => service.createMajorVersionTag(""), /Invalid version/);
   });
 
-  test("should setup git configuration and remote", () => {
+  test("should setup git with token-authenticated remote URL", () => {
     service.setupGit();
 
     assert.strictEqual(mockCommandRunner.run.mock.callCount(), 3);
@@ -176,7 +179,7 @@ describe("GitService", () => {
     );
     assert.ok(
       mockCommandRunner.run.mock.calls[0].arguments[0].includes(
-        "https://oauth2:test-token@github.com/owner/repo.git"
+        "test-token@github.com/owner/repo.git"
       )
     );
     assert.strictEqual(

@@ -140,6 +140,45 @@ describe("PackageManagerService", () => {
     );
   });
 
+  test("should update npm peer and optional dependencies", () => {
+    const peerDependencies = ["peer-pkg1"];
+    const optionalDependencies = ["opt-pkg1", "opt-pkg2"];
+
+    service.updatePackages([], [], peerDependencies, optionalDependencies);
+
+    assert.strictEqual(mockCommandRunner.run.mock.callCount(), 2);
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[0].arguments[0],
+      "npm install peer-pkg1@latest --save-peer"
+    );
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[1].arguments[0],
+      "npm install opt-pkg1@latest opt-pkg2@latest --save-optional"
+    );
+  });
+
+  test("should update all npm dependency types", () => {
+    service.updatePackages(["dep1"], ["dev1"], ["peer1"], ["opt1"]);
+
+    assert.strictEqual(mockCommandRunner.run.mock.callCount(), 4);
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[0].arguments[0],
+      "npm install dep1@latest --save"
+    );
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[1].arguments[0],
+      "npm install dev1@latest --save-dev"
+    );
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[2].arguments[0],
+      "npm install peer1@latest --save-peer"
+    );
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[3].arguments[0],
+      "npm install opt1@latest --save-optional"
+    );
+  });
+
   test("should not update empty package lists", () => {
     service.updatePackages([], []);
 
@@ -165,6 +204,38 @@ describe("PackageManagerService", () => {
     );
   });
 
+  test("should update pnpm peer and optional dependencies", () => {
+    mockConfig.get = mock.fn((key) => {
+      if (key === "packageManager") return "pnpm";
+      return "";
+    });
+    service = new PackageManagerService(
+      mockCommandRunner,
+      mockConfig,
+      mockLogger
+    );
+
+    service.updatePackages(["dep1"], ["dev1"], ["peer-pkg1"], ["opt-pkg1"]);
+
+    assert.strictEqual(mockCommandRunner.run.mock.callCount(), 4);
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[0].arguments[0],
+      "pnpm install dep1@latest"
+    );
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[1].arguments[0],
+      "pnpm install dev1@latest --dev"
+    );
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[2].arguments[0],
+      "pnpm install peer-pkg1@latest --save-peer"
+    );
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[3].arguments[0],
+      "pnpm install opt-pkg1@latest --save-optional"
+    );
+  });
+
   test("should handle yarn package manager", () => {
     mockConfig.get = mock.fn((key) => {
       if (key === "packageManager") return "yarn";
@@ -181,6 +252,30 @@ describe("PackageManagerService", () => {
     assert.strictEqual(
       mockCommandRunner.run.mock.calls[0].arguments[0],
       "yarn install --frozen-lockfile"
+    );
+  });
+
+  test("should update yarn peer and optional dependencies", () => {
+    mockConfig.get = mock.fn((key) => {
+      if (key === "packageManager") return "yarn";
+      return "";
+    });
+    service = new PackageManagerService(
+      mockCommandRunner,
+      mockConfig,
+      mockLogger
+    );
+
+    service.updatePackages([], [], ["peer-pkg1"], ["opt-pkg1"]);
+
+    assert.strictEqual(mockCommandRunner.run.mock.callCount(), 2);
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[0].arguments[0],
+      "yarn add peer-pkg1@latest --peer"
+    );
+    assert.strictEqual(
+      mockCommandRunner.run.mock.calls[1].arguments[0],
+      "yarn add opt-pkg1@latest --optional"
     );
   });
 
