@@ -62,12 +62,18 @@ class GitService {
 
   /**
    * Push changes and tags
+   * @param {string} [majorVersionTag] - Major version tag to force-push (e.g., "v6")
    */
-  push() {
+  push(majorVersionTag) {
     const branch = this.config.get("branch");
 
     this.commandRunner.run(`git push autoupdater ${branch}`);
     this.commandRunner.run("git push autoupdater --tags");
+    if (majorVersionTag) {
+      this.commandRunner.run(
+        `git push autoupdater ${majorVersionTag} --force`
+      );
+    }
   }
 
   /**
@@ -89,6 +95,25 @@ class GitService {
     }
 
     this.commandRunner.run(command);
+  }
+
+  /**
+   * Create or update major version tag (e.g., "v6" for version "6.0.1")
+   * so that users referencing the major version label always get the latest patch.
+   * @param {string} version - Full version string (e.g., "6.0.1")
+   * @returns {string} Major version tag (e.g., "v6")
+   */
+  createMajorVersionTag(version) {
+    if (!version || typeof version !== "string") {
+      throw new Error(`Invalid version: ${version}`);
+    }
+    const major = version.split(".")[0];
+    if (!major) {
+      throw new Error(`Could not extract major version from: ${version}`);
+    }
+    const majorTag = `v${major}`;
+    this.commandRunner.run(`git tag -f ${majorTag}`);
+    return majorTag;
   }
 }
 

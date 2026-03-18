@@ -93,11 +93,16 @@ class AutoUpdater {
       // Reload package data to get new version
       const updatedPackageData = this._loadPackageData();
 
+      // Create major version tag (deploy with same label, e.g., "v6")
+      const majorVersionTag = this.gitService.createMajorVersionTag(
+        updatedPackageData.version
+      );
+
       // Run user-defined checks
       this._runBuildsAndChecks();
 
       // Push changes
-      this.gitService.push();
+      this.gitService.push(majorVersionTag);
 
       this.logger.info(
         `Successfully updated ${actuallyUpdated.length} packages`
