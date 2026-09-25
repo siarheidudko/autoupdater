@@ -1,6 +1,4 @@
-"use strict";
-
-const { spawnSync } = require("child_process");
+import { spawnSync } from "child_process";
 
 /**
  * Command runner utility class
@@ -50,4 +48,4 @@ class CommandRunner {
   }
 }
 
-module.exports = CommandRunner;
+export default CommandRunner;

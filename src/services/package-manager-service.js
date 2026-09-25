@@ -1,4 +1,4 @@
-"use strict";
+
 
 /**
  * Package manager service for handling dependency updates
@@ -180,4 +180,4 @@ class PackageManagerService {
   }
 }
 
-module.exports = PackageManagerService;
+export default PackageManagerService;

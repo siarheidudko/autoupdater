@@ -1,6 +1,4 @@
-"use strict";
-
-const core = require("@actions/core");
+import core from "./actions-core.js";
 
 /**
  * Logger utility class
@@ -45,4 +43,4 @@ class Logger {
   }
 }
 
-module.exports = Logger;
+export default Logger;

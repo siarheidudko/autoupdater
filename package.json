@@ -3,6 +3,7 @@
   "version": "6.0.0",
   "description": "Automatic update of package dependencies with version up",
   "main": "src/index.js",
+  "type": "module",
   "author": {
     "name": "Siarhei Dudko",
     "email": "siarhei@dudko.dev",
@@ -54,6 +55,6 @@
     "dependabot"
   ],
   "dependencies": {
-    "@actions/core": "^2.0.3"
+    "@actions/core": "^3.0.1"
   }
 }

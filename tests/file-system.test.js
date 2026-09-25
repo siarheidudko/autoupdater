@@ -1,19 +1,16 @@
-"use strict";
-
-const { test, describe, mock, beforeEach, afterEach } = require("node:test");
-const assert = require("node:assert");
-const fs = require("fs");
-const path = require("path");
-
-const FileSystem = require("../src/utils/file-system");
+import { test, describe, mock, beforeEach, afterEach } from "node:test";
+import assert from "node:assert";
+import fs from "fs";
+import path from "path";
+import FileSystem from "../src/utils/file-system.js";
 
 describe("FileSystem", () => {
   let testFile;
   let testJsonFile;
 
   beforeEach(() => {
-    testFile = path.join(__dirname, "test-file.txt");
-    testJsonFile = path.join(__dirname, "test-file.json");
+    testFile = path.join(import.meta.dirname, "test-file.txt");
+    testJsonFile = path.join(import.meta.dirname, "test-file.json");
   });
 
   afterEach(() => {

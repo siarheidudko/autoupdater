@@ -1,9 +1,6 @@
-"use strict";
-
-const { test, describe } = require("node:test");
-const assert = require("node:assert");
-
-const { main, CleanupService } = require("../src/services/cleanup-service.js");
+import { test, describe } from "node:test";
+import assert from "node:assert";
+import { main, CleanupService } from "../src/services/cleanup-service.js";
 
 describe("Cleanup Service (Basic Tests)", () => {
   test("should export CleanupService", () => {

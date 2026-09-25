@@ -1,17 +1,18 @@
-"use strict";
-
-const { test, describe } = require("node:test");
-const assert = require("node:assert");
+import { test, describe } from "node:test";
+import assert from "node:assert";
+import Config from "../src/config/config.js";
+import Logger from "../src/utils/logger.js";
+import FileSystem from "../src/utils/file-system.js";
+import AutoUpdater from "../src/autoupdater.js";
+import { AppFactory } from "../src/index.js";
+import fs from "fs";
+import path from "path";
+import core from "../src/utils/actions-core.js";
 
 // Simple integration test to check basic functionality
 describe("Basic Integration", () => {
   test("should load all modules without errors", () => {
     // Test that all main modules can be loaded
-    const Config = require("../src/config/config");
-    const Logger = require("../src/utils/logger");
-    const FileSystem = require("../src/utils/file-system");
-    const AutoUpdater = require("../src/autoupdater");
-    const { AppFactory } = require("../src/index");
 
     assert.ok(Config);
     assert.ok(Logger);
@@ -21,16 +22,13 @@ describe("Basic Integration", () => {
   });
 
   test("should create basic file operations", () => {
-    const fs = require("fs");
-    const path = require("path");
-    const testFile = path.join(__dirname, "temp-test.json");
+    const testFile = path.join(import.meta.dirname, "temp-test.json");
 
     // Clean up first
     if (fs.existsSync(testFile)) {
       fs.unlinkSync(testFile);
     }
 
-    const FileSystem = require("../src/utils/file-system");
     const testData = { test: true, version: "1.0.0" };
 
     // Write and read JSON
@@ -46,7 +44,6 @@ describe("Basic Integration", () => {
   });
 
   test("should validate package managers", () => {
-    const core = require("@actions/core");
 
     // Mock core functions for this test
     const originalGetInput = core.getInput;
@@ -59,7 +56,6 @@ describe("Basic Integration", () => {
     core.getMultilineInput = () => [];
 
     try {
-      const Config = require("../src/config/config");
       const config = new Config();
       assert.strictEqual(config.get("packageManager"), "npm");
     } finally {

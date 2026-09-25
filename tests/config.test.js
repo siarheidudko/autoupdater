@@ -1,9 +1,7 @@
-"use strict";
-
-const { test, describe, mock, beforeEach, afterEach } = require("node:test");
-const assert = require("node:assert");
-
-const Config = require("../src/config/config");
+import { test, describe, mock, beforeEach, afterEach } from "node:test";
+import assert from "node:assert";
+import Config from "../src/config/config.js";
+import core from "../src/utils/actions-core.js";
 
 describe("Config", () => {
   let originalGetInput;
@@ -28,7 +26,6 @@ describe("Config", () => {
 
   test("should load default configuration", () => {
     // Mock core.getInput to return empty strings (defaults)
-    const core = require("@actions/core");
     mock.method(core, "getInput", () => "");
     mock.method(core, "getMultilineInput", () => []);
 
@@ -44,7 +41,6 @@ describe("Config", () => {
   });
 
   test("should load configuration from inputs", () => {
-    const core = require("@actions/core");
     const inputValues = {
       token: "test-token",
       "author-email": "test@example.com",
@@ -70,7 +66,6 @@ describe("Config", () => {
   });
 
   test("should validate package manager", () => {
-    const core = require("@actions/core");
     mock.method(core, "getInput", (key) => {
       if (key === "package-manager") return "invalid-manager";
       return "";
@@ -88,7 +83,6 @@ describe("Config", () => {
     process.env.GITHUB_REPOSITORY = "env-owner/env-repo";
     process.env.GITHUB_WORKSPACE = "/env/workspace";
 
-    const core = require("@actions/core");
     mock.method(core, "getInput", () => "");
     mock.method(core, "getMultilineInput", () => []);
 
@@ -100,7 +94,6 @@ describe("Config", () => {
   });
 
   test("should freeze configuration", () => {
-    const core = require("@actions/core");
     mock.method(core, "getInput", () => "");
     mock.method(core, "getMultilineInput", () => []);
 
@@ -113,7 +106,6 @@ describe("Config", () => {
   });
 
   test("should check debug mode correctly", () => {
-    const core = require("@actions/core");
     mock.method(core, "getInput", (key) => {
       if (key === "debug") return "true";
       return "";

@@ -1,6 +1,5 @@
-"use strict";
-
-const { join } = require("path");
+import { join } from "path";
+import { existsSync } from "fs";
 
 /**
  * Git service for handling Git operations
@@ -17,7 +16,7 @@ class GitService {
    */
   initializeRepository() {
     const gitPath = join(this.config.get("workingDirectory"), ".git");
-    if (!require("fs").existsSync(gitPath)) {
+    if (!existsSync(gitPath)) {
       this.commandRunner.run("git init");
     }
   }
@@ -92,4 +91,4 @@ class GitService {
   }
 }
 
-module.exports = GitService;
+export default GitService;
