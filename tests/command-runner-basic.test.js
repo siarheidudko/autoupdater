@@ -1,9 +1,6 @@
-"use strict";
-
-const { test, describe } = require("node:test");
-const assert = require("node:assert");
-
-const CommandRunner = require("../src/utils/command-runner.js");
+import { test, describe } from "node:test";
+import assert from "node:assert";
+import CommandRunner from "../src/utils/command-runner.js";
 
 describe("Command Runner (Basic Tests)", () => {
   test("should create CommandRunner instance", () => {

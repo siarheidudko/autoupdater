@@ -1,9 +1,8 @@
-"use strict";
-
-const { test, describe, mock, beforeEach, after } = require("node:test");
-const assert = require("node:assert");
-
-const { main, AppFactory } = require("../src/index");
+import { test, describe, mock, beforeEach, after } from "node:test";
+import assert from "node:assert";
+import { main, AppFactory } from "../src/index.js";
+import core from "../src/utils/actions-core.js";
+import Config from "../src/config/config.js";
 
 describe("Main Application", () => {
   let mockCore;
@@ -19,7 +18,7 @@ describe("Main Application", () => {
 
     // Mock @actions/core
     Object.keys(mockCore).forEach((method) => {
-      mock.method(require("@actions/core"), method, mockCore[method]);
+      mock.method(core, method, mockCore[method]);
     });
 
     // Mock process.exit to prevent actual exit during tests
@@ -34,7 +33,7 @@ describe("Main Application", () => {
 
   test("should create services correctly", () => {
     // Mock required modules
-    mock.method(require("../src/config/config").prototype, "get", (key) => {
+    mock.method(Config.prototype, "get", (key) => {
       switch (key) {
         case "workingDirectory":
           return "/test/dir";
@@ -44,7 +43,7 @@ describe("Main Application", () => {
     });
 
     mock.method(
-      require("../src/config/config").prototype,
+      Config.prototype,
       "isDebugEnabled",
       () => false
     );

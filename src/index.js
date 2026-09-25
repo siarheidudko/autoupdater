@@ -1,15 +1,13 @@
-"use strict";
-
-const core = require("@actions/core");
-const { mkdtempSync } = require("fs");
-
-const Config = require("./config/config");
-const Logger = require("./utils/logger");
-const CommandRunner = require("./utils/command-runner");
-const GitService = require("./services/git-service");
-const PackageManagerService = require("./services/package-manager-service");
-const ChangelogService = require("./services/changelog-service");
-const AutoUpdater = require("./autoupdater");
+import core from "./utils/actions-core.js";
+import { mkdtempSync } from "fs";
+import Config from "./config/config.js";
+import Logger from "./utils/logger.js";
+import CommandRunner from "./utils/command-runner.js";
+import GitService from "./services/git-service.js";
+import PackageManagerService from "./services/package-manager-service.js";
+import ChangelogService from "./services/changelog-service.js";
+import AutoUpdater from "./autoupdater.js";
+import { fileURLToPath } from "url";
 
 /**
  * Application factory for creating and configuring services
@@ -115,13 +113,13 @@ async function main() {
 }
 
 // Export for testing
-module.exports = {
+export {
   main,
   AppFactory,
 };
 
 // Run if this file is executed directly
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main()
     .then(() => {
       setTimeout(process.exit, 1, 0);

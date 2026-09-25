@@ -1,9 +1,7 @@
-"use strict";
-
-const { test, describe, mock, beforeEach } = require("node:test");
-const assert = require("node:assert");
-
-const Logger = require("../src/utils/logger");
+import { test, describe, mock, beforeEach } from "node:test";
+import assert from "node:assert";
+import Logger from "../src/utils/logger.js";
+import core from "../src/utils/actions-core.js";
 
 describe("Logger", () => {
   let mockCore;
@@ -18,9 +16,9 @@ describe("Logger", () => {
     };
 
     // Mock @actions/core module
-    mock.method(require("@actions/core"), "info", mockCore.info);
-    mock.method(require("@actions/core"), "error", mockCore.error);
-    mock.method(require("@actions/core"), "setFailed", mockCore.setFailed);
+    mock.method(core, "info", mockCore.info);
+    mock.method(core, "error", mockCore.error);
+    mock.method(core, "setFailed", mockCore.setFailed);
 
     mockConfig = {
       isDebugEnabled: mock.fn(() => false),

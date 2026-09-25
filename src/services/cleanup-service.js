@@ -1,7 +1,6 @@
-"use strict";
-
-const core = require("@actions/core");
-const { rmSync } = require("fs");
+import core from "../utils/actions-core.js";
+import { rmSync } from "fs";
+import { fileURLToPath } from "url";
 
 /**
  * Cleanup service for removing temporary files and killing processes
@@ -88,13 +87,13 @@ async function main() {
 }
 
 // Export for testing
-module.exports = {
+export {
   main,
   CleanupService,
 };
 
 // Run if this file is executed directly
-if (require.main === module) {
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
   main()
     .then(() => {
       setTimeout(process.exit, 1, 0);

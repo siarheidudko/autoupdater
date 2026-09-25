@@ -1,6 +1,4 @@
-"use strict";
-
-const core = require("@actions/core");
+import core from "../utils/actions-core.js";
 
 /**
  * Configuration class for managing application settings
@@ -81,4 +79,4 @@ class Config {
   }
 }
 
-module.exports = Config;
+export default Config;

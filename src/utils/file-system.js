@@ -1,7 +1,5 @@
-"use strict";
-
-const { readFileSync, writeFileSync, existsSync } = require("fs");
-const { join } = require("path");
+import { readFileSync, writeFileSync, existsSync } from "fs";
+import { join } from "path";
 
 /**
  * File system utility class
@@ -88,4 +86,4 @@ class FileSystem {
   }
 }
 
-module.exports = FileSystem;
+export default FileSystem;

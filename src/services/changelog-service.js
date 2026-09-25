@@ -1,6 +1,4 @@
-"use strict";
-
-const FileSystem = require("../utils/file-system");
+import FileSystem from "../utils/file-system.js";
 
 /**
  * Changelog service for managing changelog updates
@@ -80,4 +78,4 @@ class ChangelogService {
   }
 }
 
-module.exports = ChangelogService;
+export default ChangelogService;

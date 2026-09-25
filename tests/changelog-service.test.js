@@ -1,9 +1,7 @@
-"use strict";
-
-const { test, describe, mock, beforeEach } = require("node:test");
-const assert = require("node:assert");
-
-const ChangelogService = require("../src/services/changelog-service");
+import { test, describe, mock, beforeEach } from "node:test";
+import assert from "node:assert";
+import ChangelogService from "../src/services/changelog-service.js";
+import FileSystem from "../src/utils/file-system.js";
 
 describe("ChangelogService", () => {
   let service;
@@ -39,7 +37,6 @@ describe("ChangelogService", () => {
     };
 
     // Replace FileSystem methods
-    const FileSystem = require("../src/utils/file-system");
     Object.keys(mockFileSystem).forEach((method) => {
       mock.method(FileSystem, method, mockFileSystem[method]);
     });
@@ -80,7 +77,6 @@ describe("ChangelogService", () => {
   });
 
   test("should handle non-existent changelog file", () => {
-    const FileSystem = require("../src/utils/file-system");
     mock.method(FileSystem, "exists", () => false);
     mock.method(FileSystem, "writeTextFile", mock.fn());
 
@@ -122,7 +118,6 @@ describe("ChangelogService", () => {
   });
 
   test("should handle file system errors", () => {
-    const FileSystem = require("../src/utils/file-system");
     mock.method(FileSystem, "writeTextFile", () => {
       throw new Error("Write failed");
     });

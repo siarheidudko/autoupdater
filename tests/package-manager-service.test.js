@@ -1,9 +1,6 @@
-"use strict";
-
-const { test, describe, mock, beforeEach } = require("node:test");
-const assert = require("node:assert");
-
-const PackageManagerService = require("../src/services/package-manager-service");
+import { test, describe, mock, beforeEach } from "node:test";
+import assert from "node:assert";
+import PackageManagerService from "../src/services/package-manager-service.js";
 
 describe("PackageManagerService", () => {
   let service;

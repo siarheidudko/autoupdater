@@ -1,6 +1,4 @@
-"use strict";
-
-const FileSystem = require("./utils/file-system");
+import FileSystem from "./utils/file-system.js";
 
 /**
  * Main autoupdater service
@@ -199,4 +197,4 @@ class AutoUpdater {
   }
 }
 
-module.exports = AutoUpdater;
+export default AutoUpdater;
